@@ -6,6 +6,8 @@
 Designed in EasyEDA. 
 You can import json files to EasyEDA can open schematic and PCB.
 
+Except 3 parts(Micro USB Port, AMS1117-3.3V, CH32V003F4P6), other parts are all Through-Hole type. So, you can solder it easyily.
+
 ## Credits
 
 This design is based on [rv003usb](https://github.com/cnlohr/rv003usb).
