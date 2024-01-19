@@ -1,5 +1,5 @@
 # EncKiboard_Lite
-12 MX keys without LED, 1 Encoder / Using CH32V003
+12 MX keys without LED, 1 Encoder / Using CH32V003 (The lighter version of [EncKiboard](https://github.com/chaealarm/EncKiboard))
 ![image](https://github.com/chaealarm/EncKiboard_Lite/assets/12396749/3fa039b5-0cde-4c33-a9d7-99ca46ebee3f)
 ![image](https://github.com/chaealarm/EncKiboard_Lite/assets/12396749/3f888ec2-e4f5-44ac-92ed-74bf4ea7146d)
 
