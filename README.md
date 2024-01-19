@@ -9,3 +9,4 @@ You can import json files to EasyEDA can open schematic and PCB.
 ## Credits
 
 This design is based on [rv003usb](https://github.com/cnlohr/rv003usb).
+(You need both [rv003usb](https://github.com/cnlohr/rv003usb) and [ch32v003fun](https://github.com/cnlohr/ch32v003fun) libraries to using as USB HID device.)
