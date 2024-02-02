@@ -12,7 +12,6 @@ uint8_t tocust = 0;
 int i = 0;
 unsigned char tonext=0;
 
-int enc = 0; // 엔코더 값 
 char estat = 0; // 엔코더 현재위치
 char testat = 0;  // 엔코더 과거위치
 char key = 0; // 눌려진 키(0~12)
@@ -46,18 +45,22 @@ int main()
 	GPIO_port_enable(GPIO_port_A);
 	GPIO_port_enable(GPIO_port_C);
 	GPIO_port_enable(GPIO_port_D);
-	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_A, 2), GPIO_pinMode_O_pushPull, GPIO_Speed_10MHz); //LED_YELLOW
-	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_C, 0), GPIO_pinMode_O_pushPull, GPIO_Speed_10MHz); //LED_GREEN
-	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_A, 1), GPIO_pinMode_I_pullUp, GPIO_Speed_In); //EN_SW
-	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_D, 0), GPIO_pinMode_I_pullUp, GPIO_Speed_In); //EN_LE
-	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_D, 6), GPIO_pinMode_I_pullUp, GPIO_Speed_In); //EN_RI
-	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_C, 1), GPIO_pinMode_O_pushPull, GPIO_Speed_10MHz);
-	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_C, 2), GPIO_pinMode_O_pushPull, GPIO_Speed_10MHz);
-	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_C, 3), GPIO_pinMode_O_pushPull, GPIO_Speed_10MHz);
-	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_C, 4), GPIO_pinMode_O_pushPull, GPIO_Speed_10MHz);
-	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_C, 5), GPIO_pinMode_I_pullUp, GPIO_Speed_In); 
-	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_C, 6), GPIO_pinMode_I_pullUp, GPIO_Speed_In);
-	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_C, 7), GPIO_pinMode_I_pullUp, GPIO_Speed_In);
+	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_A, 2), GPIO_pinMode_O_pushPull, GPIO_Speed_50MHz); //LED_YELLOW
+	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_C, 0), GPIO_pinMode_O_pushPull, GPIO_Speed_50MHz); //LED_GREEN
+	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_A, 1), GPIO_pinMode_I_floating, GPIO_Speed_In); //EN_SW
+	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_D, 0), GPIO_pinMode_I_floating, GPIO_Speed_In); //EN_LE
+	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_D, 6), GPIO_pinMode_I_floating, GPIO_Speed_In); //EN_RI
+	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_C, 1), GPIO_pinMode_O_pushPull, GPIO_Speed_50MHz);
+	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_C, 2), GPIO_pinMode_O_pushPull, GPIO_Speed_50MHz);
+	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_C, 3), GPIO_pinMode_O_pushPull, GPIO_Speed_50MHz);
+	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_C, 4), GPIO_pinMode_O_pushPull, GPIO_Speed_50MHz);
+	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_C, 5), GPIO_pinMode_I_floating, GPIO_Speed_In);
+	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_C, 6), GPIO_pinMode_I_floating, GPIO_Speed_In);
+	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_C, 7), GPIO_pinMode_I_floating, GPIO_Speed_In);
+
+    mode = 0;
+    GPIO_digitalWrite(GPIOv_from_PORT_PIN(GPIO_port_A, 2), low);
+    GPIO_digitalWrite(GPIOv_from_PORT_PIN(GPIO_port_C, 0), high);
 
 
 	while(1)
@@ -83,20 +86,18 @@ int main()
 		{
 			if (GPIO_digitalRead(GPIOv_from_PORT_PIN(GPIO_port_D, 0)) != estat)
 			{
-				enc++;
 				mode = 1;
 				GPIO_digitalWrite(GPIOv_from_PORT_PIN(GPIO_port_A, 2), high);
 				GPIO_digitalWrite(GPIOv_from_PORT_PIN(GPIO_port_C, 0), low);
 			}
 			else
 			{
-				enc--;
 				mode = 0;
 				GPIO_digitalWrite(GPIOv_from_PORT_PIN(GPIO_port_A, 2), low);
 				GPIO_digitalWrite(GPIOv_from_PORT_PIN(GPIO_port_C, 0), high);
 			}
+            testat = estat;
 		}
-		testat = estat;
 
         // button
         if (!kchat) key = keypad();
@@ -128,7 +129,7 @@ int main()
                         break;
                     case 2: strcpy(tostr, "dc\n");
                         break;
-                    case 3: strcpy(tostr, "t\n");
+                    case 3: strcpy(tostr, "t");
                         Delay_Ms(150);
                         strcpy(tostr, "cotal\n");
                         break;
