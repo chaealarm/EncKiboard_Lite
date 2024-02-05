@@ -1,0 +1,2574 @@
+
+demo_composite_hid.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .init:
+
+00000000 <InterruptVector>:
+void InterruptVectorDefault()  __attribute__((naked)) __attribute((section(".init")));
+
+
+void InterruptVectorDefault()
+{
+	asm volatile( "\n\
+   0:	0fa0006f          	j	fa <handle_reset>
+   4:	0000                	unimp
+   6:	0000                	unimp
+   8:	016e                	slli	sp,sp,0x1b
+   a:	0000                	unimp
+   c:	016c                	addi	a1,sp,140
+	...
+  2e:	0000                	unimp
+  30:	016c                	addi	a1,sp,140
+  32:	0000                	unimp
+  34:	0000                	unimp
+  36:	0000                	unimp
+  38:	016c                	addi	a1,sp,140
+  3a:	0000                	unimp
+  3c:	0000                	unimp
+  3e:	0000                	unimp
+  40:	016c                	addi	a1,sp,140
+  42:	0000                	unimp
+  44:	016c                	addi	a1,sp,140
+  46:	0000                	unimp
+  48:	016c                	addi	a1,sp,140
+  4a:	0000                	unimp
+  4c:	016c                	addi	a1,sp,140
+  4e:	0000                	unimp
+  50:	08bc                	addi	a5,sp,88
+  52:	0000                	unimp
+  54:	016c                	addi	a1,sp,140
+  56:	0000                	unimp
+  58:	016c                	addi	a1,sp,140
+  5a:	0000                	unimp
+  5c:	016c                	addi	a1,sp,140
+  5e:	0000                	unimp
+  60:	016c                	addi	a1,sp,140
+  62:	0000                	unimp
+  64:	016c                	addi	a1,sp,140
+  66:	0000                	unimp
+  68:	016c                	addi	a1,sp,140
+  6a:	0000                	unimp
+  6c:	016c                	addi	a1,sp,140
+  6e:	0000                	unimp
+  70:	016c                	addi	a1,sp,140
+  72:	0000                	unimp
+  74:	016c                	addi	a1,sp,140
+  76:	0000                	unimp
+  78:	016c                	addi	a1,sp,140
+  7a:	0000                	unimp
+  7c:	016c                	addi	a1,sp,140
+  7e:	0000                	unimp
+  80:	016c                	addi	a1,sp,140
+  82:	0000                	unimp
+  84:	016c                	addi	a1,sp,140
+  86:	0000                	unimp
+  88:	016c                	addi	a1,sp,140
+  8a:	0000                	unimp
+  8c:	016c                	addi	a1,sp,140
+  8e:	0000                	unimp
+  90:	016c                	addi	a1,sp,140
+  92:	0000                	unimp
+  94:	016c                	addi	a1,sp,140
+  96:	0000                	unimp
+  98:	016c                	addi	a1,sp,140
+  9a:	0000                	unimp
+  9c:	0000                	unimp
+	...
+
+Disassembly of section .text:
+
+000000a0 <keypad>:
+unsigned char kchat = 254; // 키 채터링 방지용
+unsigned char ekchat = 0; 
+unsigned char kochange = 0, koflag = 0; // /r /w 시 자동 한영변환을 위한 플래그
+
+char keypad()
+{
+      a0:	1161                	addi	sp,sp,-8
+      a2:	c222                	sw	s0,4(sp)
+      a4:	c026                	sw	s1,0(sp)
+      a6:	4611                	li	a2,4
+	char q, j, res = 0, k = 0;
+      a8:	4781                	li	a5,0
+      aa:	4501                	li	a0,0
+	for (q = 4;  q>= 1; q--)
+	{
+		GPIO_digitalWrite(GPIOv_from_PORT_PIN(GPIO_port_C, q), low);
+      ac:	4285                	li	t0,1
+      ae:	400115b7          	lui	a1,0x40011
+		for (j = 7; j >= 5; j--)
+      b2:	4411                	li	s0,4
+	for (q = 4;  q>= 1; q--)
+      b4:	43b1                	li	t2,12
+		GPIO_digitalWrite(GPIOv_from_PORT_PIN(GPIO_port_C, q), low);
+      b6:	01060713          	addi	a4,a2,16
+      ba:	00e29733          	sll	a4,t0,a4
+      be:	c998                	sw	a4,16(a1)
+		for (j = 7; j >= 5; j--)
+      c0:	00878493          	addi	s1,a5,8
+		GPIO_digitalWrite(GPIOv_from_PORT_PIN(GPIO_port_C, q), low);
+      c4:	471d                	li	a4,7
+		{
+			k++;
+			if (!GPIO_digitalRead(GPIOv_from_PORT_PIN(GPIO_port_C, j)))
+      c6:	4594                	lw	a3,8(a1)
+      c8:	40e48333          	sub	t1,s1,a4
+      cc:	0ff37313          	andi	t1,t1,255
+      d0:	00e6d6b3          	srl	a3,a3,a4
+      d4:	8a85                	andi	a3,a3,1
+      d6:	e291                	bnez	a3,da <keypad+0x3a>
+			k++;
+      d8:	851a                	mv	a0,t1
+		for (j = 7; j >= 5; j--)
+      da:	177d                	addi	a4,a4,-1
+      dc:	fe8715e3          	bne	a4,s0,c6 <keypad+0x26>
+				res = k;
+		}
+		GPIO_digitalWrite(GPIOv_from_PORT_PIN(GPIO_port_C, q), high);
+      e0:	00c29733          	sll	a4,t0,a2
+			k++;
+      e4:	078d                	addi	a5,a5,3
+      e6:	0ff7f793          	andi	a5,a5,255
+		GPIO_digitalWrite(GPIOv_from_PORT_PIN(GPIO_port_C, q), high);
+      ea:	c998                	sw	a4,16(a1)
+	for (q = 4;  q>= 1; q--)
+      ec:	167d                	addi	a2,a2,-1
+      ee:	fc7794e3          	bne	a5,t2,b6 <keypad+0x16>
+	}
+	return res;
+}
+      f2:	4412                	lw	s0,4(sp)
+      f4:	4482                	lw	s1,0(sp)
+      f6:	0121                	addi	sp,sp,8
+      f8:	8082                	ret
+
+000000fa <handle_reset>:
+	asm volatile( ".option   pop;\n");
+}
+
+void handle_reset()
+{
+	asm volatile( "\n\
+      fa:	20000197          	auipc	gp,0x20000
+      fe:	70618193          	addi	gp,gp,1798 # 20000800 <__global_pointer$>
+     102:	00018113          	mv	sp,gp
+     106:	08000513          	li	a0,128
+     10a:	30051073          	csrw	mstatus,a0
+     10e:	468d                	li	a3,3
+     110:	00000517          	auipc	a0,0x0
+     114:	ef050513          	addi	a0,a0,-272 # 0 <InterruptVector>
+     118:	8d55                	or	a0,a0,a3
+     11a:	30551073          	csrw	mtvec,a0
+	csrw mtvec, a0\n" 
+	: : : "a0", "a3", "memory");
+
+	// Careful: Use registers to prevent overwriting of self-data.
+	// This clears out BSS.
+asm volatile(
+     11e:	80818513          	addi	a0,gp,-2040 # 20000008 <tonext>
+     122:	8d418593          	addi	a1,gp,-1836 # 200000d4 <_ebss>
+     126:	4601                	li	a2,0
+     128:	00b55663          	bge	a0,a1,134 <handle_reset+0x3a>
+     12c:	c110                	sw	a2,0(a0)
+     12e:	0511                	addi	a0,a0,4
+     130:	feb54ee3          	blt	a0,a1,12c <handle_reset+0x32>
+     134:	00001517          	auipc	a0,0x1
+     138:	f2050513          	addi	a0,a0,-224 # 1054 <_data_lma>
+     13c:	20000597          	auipc	a1,0x20000
+     140:	ec458593          	addi	a1,a1,-316 # 20000000 <kchat>
+     144:	80818613          	addi	a2,gp,-2040 # 20000008 <tonext>
+     148:	00c58863          	beq	a1,a2,158 <handle_reset+0x5e>
+     14c:	4114                	lw	a3,0(a0)
+     14e:	c194                	sw	a3,0(a1)
+     150:	0511                	addi	a0,a0,4
+     152:	0591                	addi	a1,a1,4
+     154:	fec59ae3          	bne	a1,a2,148 <handle_reset+0x4e>
+#endif
+);
+
+
+#if defined( FUNCONF_SYSTICK_USE_HCLK ) && FUNCONF_SYSTICK_USE_HCLK
+	SysTick->CTLR = 5;
+     158:	e000f7b7          	lui	a5,0xe000f
+     15c:	4715                	li	a4,5
+     15e:	c398                	sw	a4,0(a5)
+#else
+	SysTick->CTLR = 1;
+#endif
+
+	// set mepc to be main as the root app.
+asm volatile(
+     160:	1e600793          	li	a5,486
+     164:	34179073          	csrw	mepc,a5
+     168:	30200073          	mret
+
+0000016c <ADC1_IRQHandler>:
+	asm volatile( "1: j 1b" );
+     16c:	a001                	j	16c <ADC1_IRQHandler>
+
+0000016e <NMI_Handler>:
+	RCC->INTR |= RCC_CSSC;	// clear the clock security int flag
+     16e:	40021737          	lui	a4,0x40021
+     172:	471c                	lw	a5,8(a4)
+     174:	008006b7          	lui	a3,0x800
+     178:	8fd5                	or	a5,a5,a3
+     17a:	c71c                	sw	a5,8(a4)
+
+0000017c <strcpy>:
+char *strcpy(char *d, const char *s) { for (; (*d=*s); s++, d++); return d; }
+     17c:	0005c783          	lbu	a5,0(a1)
+     180:	00f50023          	sb	a5,0(a0)
+     184:	e391                	bnez	a5,188 <strcpy+0xc>
+     186:	8082                	ret
+     188:	0585                	addi	a1,a1,1
+     18a:	0505                	addi	a0,a0,1
+     18c:	bfc5                	j	17c <strcpy>
+
+0000018e <SystemInit>:
+#define BASE_CTLR	(((FUNCONF_HSITRIM) << 3) | RCC_HSION | HSEBYP | RCC_CSS)
+//#define BASE_CTLR	(((FUNCONF_HSITRIM) << 3) | HSEBYP | RCC_CSS)	// disable HSI in HSE modes
+
+#if defined(FUNCONF_USE_HSI) && FUNCONF_USE_HSI
+	#if defined(FUNCONF_USE_PLL) && FUNCONF_USE_PLL
+		RCC->CFGR0 = RCC_HPRE_DIV1 | RCC_PLLSRC_HSI_Mul2;
+     18e:	400217b7          	lui	a5,0x40021
+		RCC->CTLR  = BASE_CTLR | RCC_HSION | RCC_PLLON; 			// Use HSI, enable PLL.
+     192:	01080737          	lui	a4,0x1080
+		RCC->CFGR0 = RCC_HPRE_DIV1 | RCC_PLLSRC_HSI_Mul2;
+     196:	0007a223          	sw	zero,4(a5) # 40021004 <__global_pointer$+0x20020804>
+		RCC->CTLR  = BASE_CTLR | RCC_HSION | RCC_PLLON; 			// Use HSI, enable PLL.
+     19a:	08170713          	addi	a4,a4,129 # 1080081 <rv003usb.c.8bef6ca7+0x107dccf>
+     19e:	c398                	sw	a4,0(a5)
+		RCC->CTLR = BASE_CTLR | RCC_HSEON | RCC_PLLON;				// start PLL
+	#endif
+#endif
+
+#if FUNCONF_SYSTEM_CORE_CLOCK > 25000000
+	FLASH->ACTLR = FLASH_ACTLR_LATENCY_1;                   		//+1 Cycle Latency
+     1a0:	4685                	li	a3,1
+     1a2:	40022737          	lui	a4,0x40022
+     1a6:	c314                	sw	a3,0(a4)
+#else
+	FLASH->ACTLR = FLASH_ACTLR_LATENCY_0;                   		// +0 Cycle Latency
+#endif
+
+	RCC->INTR  = 0x009F0000;                               			// Clear PLL, CSSC, HSE, HSI and LSI ready flags.
+     1a8:	009f0737          	lui	a4,0x9f0
+     1ac:	c798                	sw	a4,8(a5)
+
+#if defined(FUNCONF_USE_PLL) && FUNCONF_USE_PLL
+	while((RCC->CTLR & RCC_PLLRDY) == 0);                       	// Wait till PLL is ready
+     1ae:	020006b7          	lui	a3,0x2000
+     1b2:	40021737          	lui	a4,0x40021
+     1b6:	431c                	lw	a5,0(a4)
+     1b8:	8ff5                	and	a5,a5,a3
+     1ba:	dff5                	beqz	a5,1b6 <SystemInit+0x28>
+	uint32_t tmp32 = RCC->CFGR0 & ~(0x03);							// clr the SW
+     1bc:	435c                	lw	a5,4(a4)
+	RCC->CFGR0 = tmp32 | RCC_SW_PLL;                       			// Select PLL as system clock source
+	while ((RCC->CFGR0 & (uint32_t)RCC_SWS) != (uint32_t)0x08); 	// Wait till PLL is used as system clock source
+     1be:	400216b7          	lui	a3,0x40021
+	uint32_t tmp32 = RCC->CFGR0 & ~(0x03);							// clr the SW
+     1c2:	9bf1                	andi	a5,a5,-4
+	RCC->CFGR0 = tmp32 | RCC_SW_PLL;                       			// Select PLL as system clock source
+     1c4:	0027e793          	ori	a5,a5,2
+     1c8:	c35c                	sw	a5,4(a4)
+	while ((RCC->CFGR0 & (uint32_t)RCC_SWS) != (uint32_t)0x08); 	// Wait till PLL is used as system clock source
+     1ca:	4721                	li	a4,8
+     1cc:	42dc                	lw	a5,4(a3)
+     1ce:	8bb1                	andi	a5,a5,12
+     1d0:	fee79ee3          	bne	a5,a4,1cc <SystemInit+0x3e>
+	*DMDATA1 = 0x0;
+     1d4:	e00007b7          	lui	a5,0xe0000
+     1d8:	0e07ac23          	sw	zero,248(a5) # e00000f8 <__global_pointer$+0xbffff8f8>
+	*DMDATA0 = 0x80;
+     1dc:	08000713          	li	a4,128
+     1e0:	0ee7aa23          	sw	a4,244(a5)
+	SetupUART( UART_BRR );
+#endif
+#if defined( FUNCONF_USE_DEBUGPRINTF ) && FUNCONF_USE_DEBUGPRINTF
+	SetupDebugPrintf();
+#endif
+}
+     1e4:	8082                	ret
+
+000001e6 <main>:
+
+int main()
+{
+     1e6:	1121                	addi	sp,sp,-24
+     1e8:	c822                	sw	s0,16(sp)
+     1ea:	ca06                	sw	ra,20(sp)
+     1ec:	c626                	sw	s1,12(sp)
+	SystemInit();
+     1ee:	3745                	jal	18e <SystemInit>
+#define LOCAL_CONCAT(A, B) A##B
+#define LOCAL_EXP(A, B) LOCAL_CONCAT(A,B)
+
+void usb_setup()
+{
+	rv003usb_internal_data.se0_windup = 0;
+     1f0:	82418793          	addi	a5,gp,-2012 # 20000024 <rv003usb_internal_data>
+     1f4:	0007ac23          	sw	zero,24(a5)
+
+	// Enable GPIOs, TIMERs
+	RCC->APB2PCENR |= LOCAL_EXP( RCC_APB2Periph_GPIO, USB_PORT ) | RCC_APB2Periph_AFIO;
+     1f8:	400216b7          	lui	a3,0x40021
+     1fc:	4e9c                	lw	a5,24(a3)
+#endif
+
+
+	// GPIO D3 for input pin change.
+	LOCAL_EXP( GPIO, USB_PORT )->CFGLR = 
+		( LOCAL_EXP( GPIO, USB_PORT )->CFGLR & 
+     1fe:	ff0015b7          	lui	a1,0xff001
+     202:	15fd                	addi	a1,a1,-1
+	RCC->APB2PCENR |= LOCAL_EXP( RCC_APB2Periph_GPIO, USB_PORT ) | RCC_APB2Periph_AFIO;
+     204:	0217e793          	ori	a5,a5,33
+     208:	ce9c                	sw	a5,24(a3)
+		( LOCAL_EXP( GPIO, USB_PORT )->CFGLR & 
+     20a:	400117b7          	lui	a5,0x40011
+     20e:	40078713          	addi	a4,a5,1024 # 40011400 <__global_pointer$+0x20010c00>
+     212:	4310                	lw	a2,0(a4)
+     214:	82418413          	addi	s0,gp,-2012 # 20000024 <rv003usb_internal_data>
+     218:	8e6d                	and	a2,a2,a1
+			(~( ( ( 0xf << (USB_DM*4)) | ( 0xf << (USB_DPU*4)) | ( 0xf << (USB_DP*4)) ) )) )
+		 |
+		(GPIO_Speed_In | GPIO_CNF_IN_PUPD)<<(4*USB_DM) | 
+		(GPIO_Speed_In | GPIO_CNF_IN_PUPD)<<(4*USB_DP) |
+     21a:	003885b7          	lui	a1,0x388
+     21e:	8e4d                	or	a2,a2,a1
+	LOCAL_EXP( GPIO, USB_PORT )->CFGLR = 
+     220:	c310                	sw	a2,0(a4)
+		(GPIO_Speed_50MHz | GPIO_CNF_OUT_PP)<<(4*USB_DPU);
+
+	int port_id = (((intptr_t)LOCAL_EXP( GPIO, USB_PORT )-(intptr_t)GPIOA)>>10);
+	// Configure the IO as an interrupt.
+	AFIO->EXTICR = (port_id)<<(USB_DP*2); //PORTD.3 (3 out front says PORTD, 3 in back says 3)
+     222:	30000593          	li	a1,768
+     226:	40010637          	lui	a2,0x40010
+     22a:	c60c                	sw	a1,8(a2)
+	EXTI->INTENR = 1<<USB_DP; // Enable EXT3
+     22c:	45c1                	li	a1,16
+     22e:	40b62023          	sw	a1,1024(a2) # 40010400 <__global_pointer$+0x2000fc00>
+     232:	40060513          	addi	a0,a2,1024
+	EXTI->FTENR = 1<<USB_DP;  // Rising edge trigger
+     236:	c54c                	sw	a1,12(a0)
+
+	// This drive pull-up high, which will tell the host that we are going on-bus.
+	LOCAL_EXP( GPIO, USB_PORT )->BSHR = 1<<USB_DPU;
+     238:	02000613          	li	a2,32
+     23c:	cb10                	sw	a2,16(a4)
+ *
+ * @return  none
+ */
+RV_STATIC_INLINE void NVIC_EnableIRQ(IRQn_Type IRQn)
+{
+  NVIC->IENR[((uint32_t)(IRQn) >> 5)] = (1 << ((uint32_t)(IRQn) & 0x1F));
+     23e:	001005b7          	lui	a1,0x100
+     242:	e000e637          	lui	a2,0xe000e
+     246:	10b62023          	sw	a1,256(a2) # e000e100 <__global_pointer$+0xc000d900>
+	usb_setup();
+	GPIO_port_enable(GPIO_port_A);
+     24a:	4e90                	lw	a2,24(a3)
+	GPIO_port_enable(GPIO_port_C);
+	GPIO_port_enable(GPIO_port_D);
+	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_A, 2), GPIO_pinMode_O_pushPull, GPIO_Speed_50MHz); //LED_YELLOW
+     24c:	75fd                	lui	a1,0xfffff
+     24e:	0ff58593          	addi	a1,a1,255 # fffff0ff <__global_pointer$+0xdfffe8ff>
+	GPIO_port_enable(GPIO_port_A);
+     252:	00466613          	ori	a2,a2,4
+     256:	ce90                	sw	a2,24(a3)
+	GPIO_port_enable(GPIO_port_C);
+     258:	4e90                	lw	a2,24(a3)
+     25a:	01066613          	ori	a2,a2,16
+     25e:	ce90                	sw	a2,24(a3)
+	GPIO_port_enable(GPIO_port_D);
+     260:	4e90                	lw	a2,24(a3)
+     262:	02066613          	ori	a2,a2,32
+     266:	ce90                	sw	a2,24(a3)
+	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_A, 2), GPIO_pinMode_O_pushPull, GPIO_Speed_50MHz); //LED_YELLOW
+     268:	80078693          	addi	a3,a5,-2048
+     26c:	4290                	lw	a2,0(a3)
+     26e:	8e6d                	and	a2,a2,a1
+     270:	c290                	sw	a2,0(a3)
+     272:	4290                	lw	a2,0(a3)
+     274:	30066613          	ori	a2,a2,768
+     278:	c290                	sw	a2,0(a3)
+	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_C, 0), GPIO_pinMode_O_pushPull, GPIO_Speed_50MHz); //LED_GREEN
+     27a:	4390                	lw	a2,0(a5)
+     27c:	9a41                	andi	a2,a2,-16
+     27e:	c390                	sw	a2,0(a5)
+     280:	4390                	lw	a2,0(a5)
+     282:	00366613          	ori	a2,a2,3
+     286:	c390                	sw	a2,0(a5)
+	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_A, 1), GPIO_pinMode_I_floating, GPIO_Speed_In); //EN_SW
+     288:	4290                	lw	a2,0(a3)
+     28a:	f0f67613          	andi	a2,a2,-241
+     28e:	c290                	sw	a2,0(a3)
+     290:	4290                	lw	a2,0(a3)
+     292:	04066613          	ori	a2,a2,64
+     296:	c290                	sw	a2,0(a3)
+	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_D, 0), GPIO_pinMode_I_floating, GPIO_Speed_In); //EN_LE
+     298:	4310                	lw	a2,0(a4)
+     29a:	9a41                	andi	a2,a2,-16
+     29c:	c310                	sw	a2,0(a4)
+     29e:	4310                	lw	a2,0(a4)
+     2a0:	00466613          	ori	a2,a2,4
+     2a4:	c310                	sw	a2,0(a4)
+	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_D, 6), GPIO_pinMode_I_floating, GPIO_Speed_In); //EN_RI
+     2a6:	4308                	lw	a0,0(a4)
+     2a8:	f1000637          	lui	a2,0xf1000
+     2ac:	167d                	addi	a2,a2,-1
+     2ae:	8d71                	and	a0,a0,a2
+     2b0:	c308                	sw	a0,0(a4)
+     2b2:	00072303          	lw	t1,0(a4) # 40021000 <__global_pointer$+0x20020800>
+     2b6:	04000537          	lui	a0,0x4000
+     2ba:	00a36333          	or	t1,t1,a0
+     2be:	00672023          	sw	t1,0(a4)
+	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_C, 1), GPIO_pinMode_O_pushPull, GPIO_Speed_50MHz);
+     2c2:	4398                	lw	a4,0(a5)
+     2c4:	f0f77713          	andi	a4,a4,-241
+     2c8:	c398                	sw	a4,0(a5)
+     2ca:	4398                	lw	a4,0(a5)
+     2cc:	03076713          	ori	a4,a4,48
+     2d0:	c398                	sw	a4,0(a5)
+	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_C, 2), GPIO_pinMode_O_pushPull, GPIO_Speed_50MHz);
+     2d2:	4398                	lw	a4,0(a5)
+     2d4:	8df9                	and	a1,a1,a4
+     2d6:	c38c                	sw	a1,0(a5)
+     2d8:	4398                	lw	a4,0(a5)
+	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_C, 3), GPIO_pinMode_O_pushPull, GPIO_Speed_50MHz);
+     2da:	75c5                	lui	a1,0xffff1
+     2dc:	15fd                	addi	a1,a1,-1
+	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_C, 2), GPIO_pinMode_O_pushPull, GPIO_Speed_50MHz);
+     2de:	30076713          	ori	a4,a4,768
+     2e2:	c398                	sw	a4,0(a5)
+	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_C, 3), GPIO_pinMode_O_pushPull, GPIO_Speed_50MHz);
+     2e4:	4398                	lw	a4,0(a5)
+     2e6:	8f6d                	and	a4,a4,a1
+     2e8:	c398                	sw	a4,0(a5)
+     2ea:	4398                	lw	a4,0(a5)
+     2ec:	658d                	lui	a1,0x3
+     2ee:	8f4d                	or	a4,a4,a1
+     2f0:	c398                	sw	a4,0(a5)
+	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_C, 4), GPIO_pinMode_O_pushPull, GPIO_Speed_50MHz);
+     2f2:	4398                	lw	a4,0(a5)
+     2f4:	fff105b7          	lui	a1,0xfff10
+     2f8:	15fd                	addi	a1,a1,-1
+     2fa:	8f6d                	and	a4,a4,a1
+     2fc:	c398                	sw	a4,0(a5)
+     2fe:	4398                	lw	a4,0(a5)
+     300:	000305b7          	lui	a1,0x30
+     304:	8f4d                	or	a4,a4,a1
+     306:	c398                	sw	a4,0(a5)
+	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_C, 5), GPIO_pinMode_I_floating, GPIO_Speed_In);
+     308:	4398                	lw	a4,0(a5)
+     30a:	ff1005b7          	lui	a1,0xff100
+     30e:	15fd                	addi	a1,a1,-1
+     310:	8f6d                	and	a4,a4,a1
+     312:	c398                	sw	a4,0(a5)
+     314:	438c                	lw	a1,0(a5)
+     316:	00400737          	lui	a4,0x400
+     31a:	8dd9                	or	a1,a1,a4
+     31c:	c38c                	sw	a1,0(a5)
+	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_C, 6), GPIO_pinMode_I_floating, GPIO_Speed_In);
+     31e:	438c                	lw	a1,0(a5)
+     320:	8e6d                	and	a2,a2,a1
+     322:	c390                	sw	a2,0(a5)
+     324:	4398                	lw	a4,0(a5)
+	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_C, 7), GPIO_pinMode_I_floating, GPIO_Speed_In);
+     326:	40000637          	lui	a2,0x40000
+	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_C, 6), GPIO_pinMode_I_floating, GPIO_Speed_In);
+     32a:	8f49                	or	a4,a4,a0
+     32c:	c398                	sw	a4,0(a5)
+	GPIO_pinMode(GPIOv_from_PORT_PIN(GPIO_port_C, 7), GPIO_pinMode_I_floating, GPIO_Speed_In);
+     32e:	4398                	lw	a4,0(a5)
+     330:	0712                	slli	a4,a4,0x4
+     332:	8311                	srli	a4,a4,0x4
+     334:	c398                	sw	a4,0(a5)
+     336:	4398                	lw	a4,0(a5)
+     338:	8f51                	or	a4,a4,a2
+     33a:	c398                	sw	a4,0(a5)
+
+    mode = 0;
+    GPIO_digitalWrite(GPIOv_from_PORT_PIN(GPIO_port_A, 2), low);
+     33c:	00040637          	lui	a2,0x40
+    mode = 0;
+     340:	82018023          	sb	zero,-2016(gp) # 20000020 <mode>
+    GPIO_digitalWrite(GPIOv_from_PORT_PIN(GPIO_port_A, 2), low);
+     344:	ca90                	sw	a2,16(a3)
+    GPIO_digitalWrite(GPIOv_from_PORT_PIN(GPIO_port_C, 0), high);
+     346:	4685                	li	a3,1
+     348:	cb94                	sw	a3,16(a5)
+     34a:	c03a                	sw	a4,0(sp)
+			GPIO_digitalWrite(GPIOv_from_PORT_PIN(GPIO_port_A, 2), low);
+		}
+		*/
+		
+		//enc
+		estat = GPIO_digitalRead(GPIOv_from_PORT_PIN(GPIO_port_D, 6));
+     34c:	400116b7          	lui	a3,0x40011
+     350:	40068713          	addi	a4,a3,1024 # 40011400 <__global_pointer$+0x20010c00>
+     354:	471c                	lw	a5,8(a4)
+		if (estat != testat)
+     356:	81f1c603          	lbu	a2,-2017(gp) # 2000001f <testat>
+		estat = GPIO_digitalRead(GPIOv_from_PORT_PIN(GPIO_port_D, 6));
+     35a:	8399                	srli	a5,a5,0x6
+     35c:	8b85                	andi	a5,a5,1
+		if (estat != testat)
+     35e:	02f60263          	beq	a2,a5,382 <main+0x19c>
+		{
+			if (GPIO_digitalRead(GPIOv_from_PORT_PIN(GPIO_port_D, 0)) != estat)
+     362:	4718                	lw	a4,8(a4)
+     364:	80068613          	addi	a2,a3,-2048
+     368:	8b05                	andi	a4,a4,1
+     36a:	06f70863          	beq	a4,a5,3da <main+0x1f4>
+			{
+				mode = 1;
+     36e:	4582                	lw	a1,0(sp)
+     370:	4705                	li	a4,1
+     372:	82e18023          	sb	a4,-2016(gp) # 20000020 <mode>
+				GPIO_digitalWrite(GPIOv_from_PORT_PIN(GPIO_port_A, 2), high);
+     376:	4711                	li	a4,4
+     378:	ca18                	sw	a4,16(a2)
+				GPIO_digitalWrite(GPIOv_from_PORT_PIN(GPIO_port_C, 0), low);
+     37a:	6741                	lui	a4,0x10
+			}
+			else
+			{
+				mode = 0;
+				GPIO_digitalWrite(GPIOv_from_PORT_PIN(GPIO_port_A, 2), low);
+				GPIO_digitalWrite(GPIOv_from_PORT_PIN(GPIO_port_C, 0), high);
+     37c:	ca98                	sw	a4,16(a3)
+			}
+            testat = estat;
+     37e:	80f18fa3          	sb	a5,-2017(gp) # 2000001f <testat>
+		}
+
+        // button
+        if (!kchat) key = keypad();
+     382:	200007b7          	lui	a5,0x20000
+     386:	0007c703          	lbu	a4,0(a5) # 20000000 <kchat>
+     38a:	c23e                	sw	a5,4(sp)
+     38c:	e701                	bnez	a4,394 <main+0x1ae>
+     38e:	3b09                	jal	a0 <keypad>
+     390:	80a18f23          	sb	a0,-2018(gp) # 2000001e <key>
+
+        if (key != tkey)
+     394:	81e1c483          	lbu	s1,-2018(gp) # 2000001e <key>
+     398:	81d1c703          	lbu	a4,-2019(gp) # 2000001d <tkey>
+     39c:	c43e                	sw	a5,8(sp)
+     39e:	1e970063          	beq	a4,s1,57e <main+0x398>
+        {
+            if (key)
+     3a2:	1c048763          	beqz	s1,570 <main+0x38a>
+            {
+
+                if (koflag && key)
+     3a6:	81c1c703          	lbu	a4,-2020(gp) # 2000001c <koflag>
+     3aa:	e321                	bnez	a4,3ea <main+0x204>
+                    kochange = 1;
+                    koflag = 0;
+                    Delay_Ms(100);
+                }
+
+                if (mode == 0)
+     3ac:	4782                	lw	a5,0(sp)
+     3ae:	8201c783          	lbu	a5,-2016(gp) # 20000020 <mode>
+     3b2:	c3bd                	beqz	a5,418 <main+0x232>
+                    case 12: strcpy(tostr, "Mode 0 Key 12\n");
+                        break;
+                    }
+
+                }
+                else if (mode == 1)
+     3b4:	4705                	li	a4,1
+     3b6:	14e79263          	bne	a5,a4,4fa <main+0x314>
+                {
+                    switch (key)
+     3ba:	fff48793          	addi	a5,s1,-1
+     3be:	0ff7f793          	andi	a5,a5,255
+     3c2:	472d                	li	a4,11
+     3c4:	1af76663          	bltu	a4,a5,570 <main+0x38a>
+     3c8:	6705                	lui	a4,0x1
+     3ca:	078a                	slli	a5,a5,0x2
+     3cc:	cb870713          	addi	a4,a4,-840 # cb8 <always0+0x4>
+     3d0:	97ba                	add	a5,a5,a4
+     3d2:	439c                	lw	a5,0(a5)
+     3d4:	8a018513          	addi	a0,gp,-1888 # 200000a0 <tostr>
+     3d8:	8782                	jr	a5
+				mode = 0;
+     3da:	4702                	lw	a4,0(sp)
+     3dc:	82018023          	sb	zero,-2016(gp) # 20000020 <mode>
+				GPIO_digitalWrite(GPIOv_from_PORT_PIN(GPIO_port_A, 2), low);
+     3e0:	00040737          	lui	a4,0x40
+     3e4:	ca18                	sw	a4,16(a2)
+				GPIO_digitalWrite(GPIOv_from_PORT_PIN(GPIO_port_C, 0), high);
+     3e6:	4705                	li	a4,1
+     3e8:	bf51                	j	37c <main+0x196>
+                    while (i);
+     3ea:	8181a703          	lw	a4,-2024(gp) # 20000018 <i>
+     3ee:	e301                	bnez	a4,3ee <main+0x208>
+                    kochange = 1;
+     3f0:	4685                	li	a3,1
+     3f2:	80d18b23          	sb	a3,-2026(gp) # 20000016 <kochange>
+                    koflag = 0;
+     3f6:	80018e23          	sb	zero,-2020(gp) # 2000001c <koflag>
+	uint32_t targend = SysTick->CNT + n;
+     3fa:	e000f7b7          	lui	a5,0xe000f
+     3fe:	4798                	lw	a4,8(a5)
+     400:	004947b7          	lui	a5,0x494
+     404:	e0078793          	addi	a5,a5,-512 # 493e00 <rv003usb.c.8bef6ca7+0x491a4e>
+     408:	973e                	add	a4,a4,a5
+	while( ((int32_t)( SysTick->CNT - targend )) < 0 );
+     40a:	e000f6b7          	lui	a3,0xe000f
+     40e:	469c                	lw	a5,8(a3)
+     410:	8f99                	sub	a5,a5,a4
+     412:	fe07cee3          	bltz	a5,40e <main+0x228>
+     416:	bf59                	j	3ac <main+0x1c6>
+                    switch (key) {
+     418:	fff48793          	addi	a5,s1,-1
+     41c:	0ff7f793          	andi	a5,a5,255
+     420:	472d                	li	a4,11
+     422:	14f76763          	bltu	a4,a5,570 <main+0x38a>
+     426:	6705                	lui	a4,0x1
+     428:	078a                	slli	a5,a5,0x2
+     42a:	ce870713          	addi	a4,a4,-792 # ce8 <always0+0x34>
+     42e:	97ba                	add	a5,a5,a4
+     430:	439c                	lw	a5,0(a5)
+     432:	8a018513          	addi	a0,gp,-1888 # 200000a0 <tostr>
+     436:	8782                	jr	a5
+                    case 1: strcpy(tostr, "Mode 0 Key 1\n");
+     438:	6585                	lui	a1,0x1
+     43a:	eac58593          	addi	a1,a1,-340 # eac <string0+0x4>
+                        break;
+                    case 10: tocust = 0x2A;
+                        break;
+                    case 11: strcpy(tostr, "0");
+                        break;
+                    case 12: strcpy(tostr, "\n");
+     43e:	3b3d                	jal	17c <strcpy>
+                        break;
+     440:	aa05                	j	570 <main+0x38a>
+                    case 2: strcpy(tostr, "Mode 0 Key 2\n");
+     442:	6585                	lui	a1,0x1
+     444:	ebc58593          	addi	a1,a1,-324 # ebc <string0+0x14>
+     448:	bfdd                	j	43e <main+0x258>
+                    case 3: strcpy(tostr, "Mode 0 Key 3\n");
+     44a:	6585                	lui	a1,0x1
+     44c:	ecc58593          	addi	a1,a1,-308 # ecc <string0+0x24>
+     450:	b7fd                	j	43e <main+0x258>
+                    case 4: strcpy(tostr, "Mode 0 Key 4\n");
+     452:	6585                	lui	a1,0x1
+     454:	edc58593          	addi	a1,a1,-292 # edc <string0+0x34>
+     458:	b7dd                	j	43e <main+0x258>
+                    case 5: strcpy(tostr, "Mode 0 Key 5\n");
+     45a:	6585                	lui	a1,0x1
+     45c:	eec58593          	addi	a1,a1,-276 # eec <string0+0x44>
+     460:	bff9                	j	43e <main+0x258>
+                    case 6: strcpy(tostr, "Mode 0 Key 6\n");
+     462:	6585                	lui	a1,0x1
+     464:	efc58593          	addi	a1,a1,-260 # efc <string0+0x54>
+     468:	bfd9                	j	43e <main+0x258>
+                    case 7: strcpy(tostr, "Mode 0 Key 7\n");
+     46a:	6585                	lui	a1,0x1
+     46c:	f0c58593          	addi	a1,a1,-244 # f0c <string0+0x64>
+     470:	b7f9                	j	43e <main+0x258>
+                    case 8: strcpy(tostr, "Mode 0 Key 8\n");
+     472:	6585                	lui	a1,0x1
+     474:	f1c58593          	addi	a1,a1,-228 # f1c <string0+0x74>
+     478:	b7d9                	j	43e <main+0x258>
+                    case 9: strcpy(tostr, "Mode 0 Key 9\n");
+     47a:	6585                	lui	a1,0x1
+     47c:	f2c58593          	addi	a1,a1,-212 # f2c <string0+0x84>
+     480:	bf7d                	j	43e <main+0x258>
+                    case 10: strcpy(tostr, "Mode 0 Key 10\n");
+     482:	6585                	lui	a1,0x1
+     484:	f3c58593          	addi	a1,a1,-196 # f3c <string0+0x94>
+     488:	bf5d                	j	43e <main+0x258>
+                    case 11: strcpy(tostr, "Mode 0 Key 11\n");
+     48a:	6585                	lui	a1,0x1
+     48c:	f4c58593          	addi	a1,a1,-180 # f4c <string0+0xa4>
+     490:	b77d                	j	43e <main+0x258>
+                    case 12: strcpy(tostr, "Mode 0 Key 12\n");
+     492:	6585                	lui	a1,0x1
+     494:	f5c58593          	addi	a1,a1,-164 # f5c <string0+0xb4>
+     498:	b75d                	j	43e <main+0x258>
+                    case 1: strcpy(tostr, "Mode 1 Key 1\n");
+     49a:	6585                	lui	a1,0x1
+     49c:	f6c58593          	addi	a1,a1,-148 # f6c <string0+0xc4>
+     4a0:	bf79                	j	43e <main+0x258>
+                    case 2: strcpy(tostr, "Mode 1 Key 2\n");
+     4a2:	6585                	lui	a1,0x1
+     4a4:	f7c58593          	addi	a1,a1,-132 # f7c <string0+0xd4>
+     4a8:	bf59                	j	43e <main+0x258>
+                    case 3: strcpy(tostr, "Mode 1 Key 3\n");
+     4aa:	6585                	lui	a1,0x1
+     4ac:	f8c58593          	addi	a1,a1,-116 # f8c <string0+0xe4>
+     4b0:	b779                	j	43e <main+0x258>
+                    case 4: strcpy(tostr, "Mode 1 Key 4\n");
+     4b2:	6585                	lui	a1,0x1
+     4b4:	f9c58593          	addi	a1,a1,-100 # f9c <string0+0xf4>
+     4b8:	b759                	j	43e <main+0x258>
+                    case 5: strcpy(tostr, "Mode 1 Key 5\n");
+     4ba:	6585                	lui	a1,0x1
+     4bc:	fac58593          	addi	a1,a1,-84 # fac <string0+0x104>
+     4c0:	bfbd                	j	43e <main+0x258>
+                    case 6: strcpy(tostr, "Mode 1 Key 6\n");
+     4c2:	6585                	lui	a1,0x1
+     4c4:	fbc58593          	addi	a1,a1,-68 # fbc <string0+0x114>
+     4c8:	bf9d                	j	43e <main+0x258>
+                    case 7: strcpy(tostr, "Mode 1 Key 7\n");
+     4ca:	6585                	lui	a1,0x1
+     4cc:	fcc58593          	addi	a1,a1,-52 # fcc <string0+0x124>
+     4d0:	b7bd                	j	43e <main+0x258>
+                    case 8: strcpy(tostr, "Mode 1 Key 8\n");
+     4d2:	6585                	lui	a1,0x1
+     4d4:	fdc58593          	addi	a1,a1,-36 # fdc <string0+0x134>
+     4d8:	b79d                	j	43e <main+0x258>
+                    case 9: strcpy(tostr, "Mode 1 Key 9\n");
+     4da:	6585                	lui	a1,0x1
+     4dc:	fec58593          	addi	a1,a1,-20 # fec <string0+0x144>
+     4e0:	bfb9                	j	43e <main+0x258>
+                    case 10: strcpy(tostr, "Mode 1 Key 10\n");
+     4e2:	6585                	lui	a1,0x1
+     4e4:	ffc58593          	addi	a1,a1,-4 # ffc <string0+0x154>
+     4e8:	bf99                	j	43e <main+0x258>
+                    case 11: strcpy(tostr, "Mode 1 Key 11\n");
+     4ea:	6585                	lui	a1,0x1
+     4ec:	00c58593          	addi	a1,a1,12 # 100c <string0+0x164>
+     4f0:	b7b9                	j	43e <main+0x258>
+                    case 12: strcpy(tostr, "Mode 1 Key 12\n");
+     4f2:	6585                	lui	a1,0x1
+     4f4:	01c58593          	addi	a1,a1,28 # 101c <string0+0x174>
+     4f8:	b799                	j	43e <main+0x258>
+                else if (mode == 3 && key)
+     4fa:	470d                	li	a4,3
+     4fc:	06e79a63          	bne	a5,a4,570 <main+0x38a>
+                    switch (key)
+     500:	fff48793          	addi	a5,s1,-1
+     504:	0ff7f793          	andi	a5,a5,255
+     508:	472d                	li	a4,11
+     50a:	06f76363          	bltu	a4,a5,570 <main+0x38a>
+     50e:	6705                	lui	a4,0x1
+     510:	078a                	slli	a5,a5,0x2
+     512:	d1870713          	addi	a4,a4,-744 # d18 <always0+0x64>
+     516:	97ba                	add	a5,a5,a4
+     518:	439c                	lw	a5,0(a5)
+     51a:	8782                	jr	a5
+                    case 1: strcpy(tostr, "7");
+     51c:	6585                	lui	a1,0x1
+     51e:	02c58593          	addi	a1,a1,44 # 102c <string0+0x184>
+                    case 12: strcpy(tostr, "\n");
+     522:	07c40513          	addi	a0,s0,124
+     526:	bf21                	j	43e <main+0x258>
+                    case 2: strcpy(tostr, "8");
+     528:	6585                	lui	a1,0x1
+     52a:	03058593          	addi	a1,a1,48 # 1030 <string0+0x188>
+     52e:	bfd5                	j	522 <main+0x33c>
+                    case 3: strcpy(tostr, "9");
+     530:	6585                	lui	a1,0x1
+     532:	03458593          	addi	a1,a1,52 # 1034 <string0+0x18c>
+     536:	b7f5                	j	522 <main+0x33c>
+                    case 4: strcpy(tostr, "4");
+     538:	6585                	lui	a1,0x1
+     53a:	03858593          	addi	a1,a1,56 # 1038 <string0+0x190>
+     53e:	b7d5                	j	522 <main+0x33c>
+                    case 5: strcpy(tostr, "5");
+     540:	6585                	lui	a1,0x1
+     542:	03c58593          	addi	a1,a1,60 # 103c <string0+0x194>
+     546:	bff1                	j	522 <main+0x33c>
+                    case 6: strcpy(tostr, "6");
+     548:	6585                	lui	a1,0x1
+     54a:	04058593          	addi	a1,a1,64 # 1040 <string0+0x198>
+     54e:	bfd1                	j	522 <main+0x33c>
+                    case 7: strcpy(tostr, "1");
+     550:	6585                	lui	a1,0x1
+     552:	04458593          	addi	a1,a1,68 # 1044 <string0+0x19c>
+     556:	b7f1                	j	522 <main+0x33c>
+                    case 8: strcpy(tostr, "2");
+     558:	6585                	lui	a1,0x1
+     55a:	04858593          	addi	a1,a1,72 # 1048 <string0+0x1a0>
+     55e:	b7d1                	j	522 <main+0x33c>
+                    case 9: strcpy(tostr, "3");
+     560:	6585                	lui	a1,0x1
+     562:	04c58593          	addi	a1,a1,76 # 104c <string0+0x1a4>
+     566:	bf75                	j	522 <main+0x33c>
+                    case 10: tocust = 0x2A;
+     568:	02a00713          	li	a4,42
+     56c:	80e18aa3          	sb	a4,-2027(gp) # 20000015 <tocust>
+                    }
+                }
+
+            }
+
+            kchat = 254;
+     570:	4712                	lw	a4,4(sp)
+     572:	57f9                	li	a5,-2
+     574:	00f70023          	sb	a5,0(a4)
+            tkey = key;
+     578:	47a2                	lw	a5,8(sp)
+     57a:	80918ea3          	sb	s1,-2019(gp) # 2000001d <tkey>
+
+        }
+
+        if (kchat && keypad() != key) kchat--;
+     57e:	4792                	lw	a5,4(sp)
+     580:	0007c783          	lbu	a5,0(a5)
+     584:	cb91                	beqz	a5,598 <main+0x3b2>
+     586:	c43e                	sw	a5,8(sp)
+     588:	3e21                	jal	a0 <keypad>
+     58a:	00a48763          	beq	s1,a0,598 <main+0x3b2>
+     58e:	47a2                	lw	a5,8(sp)
+     590:	4712                	lw	a4,4(sp)
+     592:	17fd                	addi	a5,a5,-1
+     594:	00f70023          	sb	a5,0(a4)
+
+        //ENSW
+        if (!GPIO_digitalRead(GPIOv_from_PORT_PIN(GPIO_port_A, 1)))
+     598:	400117b7          	lui	a5,0x40011
+     59c:	80078793          	addi	a5,a5,-2048 # 40010800 <__global_pointer$+0x20010000>
+     5a0:	479c                	lw	a5,8(a5)
+     5a2:	8b89                	andi	a5,a5,2
+     5a4:	e781                	bnez	a5,5ac <main+0x3c6>
+        {
+            ekchat = 254;
+     5a6:	57f9                	li	a5,-2
+     5a8:	80f18a23          	sb	a5,-2028(gp) # 20000014 <ekchat>
+        }
+        if (ekchat && GPIO_digitalRead(GPIOv_from_PORT_PIN(GPIO_port_A, 1)))
+     5ac:	8141c783          	lbu	a5,-2028(gp) # 20000014 <ekchat>
+     5b0:	d8078ee3          	beqz	a5,34c <main+0x166>
+     5b4:	40011637          	lui	a2,0x40011
+     5b8:	80060593          	addi	a1,a2,-2048 # 40010800 <__global_pointer$+0x20010000>
+     5bc:	4594                	lw	a3,8(a1)
+     5be:	8a89                	andi	a3,a3,2
+     5c0:	d80686e3          	beqz	a3,34c <main+0x166>
+        {
+            ekchat--;
+     5c4:	17fd                	addi	a5,a5,-1
+     5c6:	0ff7f793          	andi	a5,a5,255
+     5ca:	80f18a23          	sb	a5,-2028(gp) # 20000014 <ekchat>
+            if (!ekchat)
+     5ce:	d6079fe3          	bnez	a5,34c <main+0x166>
+            {
+                if (mode != 3)
+     5d2:	4782                	lw	a5,0(sp)
+     5d4:	8201c703          	lbu	a4,-2016(gp) # 20000020 <mode>
+     5d8:	478d                	li	a5,3
+     5da:	02f70263          	beq	a4,a5,5fe <main+0x418>
+                {
+                    GPIO_digitalWrite(GPIOv_from_PORT_PIN(GPIO_port_A, 2), high);
+     5de:	4711                	li	a4,4
+     5e0:	c998                	sw	a4,16(a1)
+                    GPIO_digitalWrite(GPIOv_from_PORT_PIN(GPIO_port_C, 0), high);
+     5e2:	4705                	li	a4,1
+     5e4:	ca18                	sw	a4,16(a2)
+                    mode = 3;
+     5e6:	4702                	lw	a4,0(sp)
+     5e8:	82f18023          	sb	a5,-2016(gp) # 20000020 <mode>
+     5ec:	b385                	j	34c <main+0x166>
+                    case 11: strcpy(tostr, "0");
+     5ee:	6585                	lui	a1,0x1
+     5f0:	05058593          	addi	a1,a1,80 # 1050 <string0+0x1a8>
+     5f4:	b73d                	j	522 <main+0x33c>
+                    case 12: strcpy(tostr, "\n");
+     5f6:	6585                	lui	a1,0x1
+     5f8:	eb858593          	addi	a1,a1,-328 # eb8 <string0+0x10>
+     5fc:	b71d                	j	522 <main+0x33c>
+                }
+                else
+                {
+                    GPIO_digitalWrite(GPIOv_from_PORT_PIN(GPIO_port_A, 2), low);
+     5fe:	000407b7          	lui	a5,0x40
+     602:	c99c                	sw	a5,16(a1)
+                    GPIO_digitalWrite(GPIOv_from_PORT_PIN(GPIO_port_C, 0), high);
+     604:	4785                	li	a5,1
+     606:	ca1c                	sw	a5,16(a2)
+                    mode = 0;
+     608:	4782                	lw	a5,0(sp)
+     60a:	82018023          	sb	zero,-2016(gp) # 20000020 <mode>
+     60e:	bb3d                	j	34c <main+0x166>
+
+00000610 <usb_pid_handle_in>:
+	ist->current_endpoint = endp;
+	struct usb_endpoint * e = &ist->eps[endp];
+
+	int tosend = 0;
+	uint8_t * sendnow;
+	int sendtok = e->toggle_in?0b01001011:0b11000011;
+     610:	00561793          	slli	a5,a2,0x5
+     614:	00f706b3          	add	a3,a4,a5
+	ist->current_endpoint = endp;
+     618:	c310                	sw	a2,0(a4)
+	int sendtok = e->toggle_in?0b01001011:0b11000011;
+     61a:	528c                	lw	a1,32(a3)
+     61c:	0c300693          	li	a3,195
+     620:	c199                	beqz	a1,626 <usb_pid_handle_in+0x16>
+     622:	04b00693          	li	a3,75
+
+#if RV003USB_HANDLE_IN_REQUEST
+	if( e->custom || endp )
+     626:	97ba                	add	a5,a5,a4
+     628:	579c                	lw	a5,40(a5)
+     62a:	8fd1                	or	a5,a5,a2
+     62c:	1c078e63          	beqz	a5,808 <usb_pid_handle_in+0x1f8>
+	}
+}
+
+void usb_handle_user_in_request( struct usb_endpoint * e, uint8_t * scratchpad, int endp, uint32_t sendtok, struct rv003usb_internal * ist )
+{
+	if( endp == 2 )
+     630:	4789                	li	a5,2
+     632:	1ef61663          	bne	a2,a5,81e <usb_pid_handle_in+0x20e>
+{
+     636:	1141                	addi	sp,sp,-16
+     638:	c422                	sw	s0,8(sp)
+	{
+		// Keyboard (8 bytes)
+		
+		static uint8_t tsajoystick[8] = { 0x00 };
+		usb_send_data( tsajoystick, 8, 0, sendtok );
+     63a:	20000437          	lui	s0,0x20000
+     63e:	4601                	li	a2,0
+     640:	45a1                	li	a1,8
+     642:	00c40513          	addi	a0,s0,12 # 2000000c <tsajoystick.0>
+     646:	c606                	sw	ra,12(sp)
+     648:	c226                	sw	s1,4(sp)
+     64a:	2b35                	jal	b86 <usb_send_data>
+
+		if (tostr[i] == 0) //전송종료
+     64c:	8181a683          	lw	a3,-2024(gp) # 20000018 <i>
+     650:	82418793          	addi	a5,gp,-2012 # 20000024 <rv003usb_internal_data>
+     654:	97b6                	add	a5,a5,a3
+     656:	07c7c683          	lbu	a3,124(a5) # 4007c <rv003usb.c.8bef6ca7+0x3dcca>
+     65a:	82418713          	addi	a4,gp,-2012 # 20000024 <rv003usb_internal_data>
+     65e:	c03a                	sw	a4,0(sp)
+     660:	8622                	mv	a2,s0
+     662:	ea99                	bnez	a3,678 <usb_pid_handle_in+0x68>
+		{
+			tsajoystick[0] = 0;
+     664:	00c40713          	addi	a4,s0,12
+     668:	00070023          	sb	zero,0(a4)
+			tsajoystick[2] = 0;
+     66c:	00070123          	sb	zero,2(a4)
+			tostr[i] = 0;
+     670:	06078e23          	sb	zero,124(a5)
+			i = 0;
+     674:	8001ac23          	sw	zero,-2024(gp) # 20000018 <i>
+		}
+		if (tonext == 1 || tonext == 2)
+     678:	200006b7          	lui	a3,0x20000
+     67c:	0086c783          	lbu	a5,8(a3) # 20000008 <tonext>
+     680:	4585                	li	a1,1
+     682:	fff78713          	addi	a4,a5,-1
+     686:	0ff77713          	andi	a4,a4,255
+     68a:	00e5ef63          	bltu	a1,a4,6a8 <usb_pid_handle_in+0x98>
+		{
+			tonext++;
+     68e:	0785                	addi	a5,a5,1
+     690:	00f68423          	sb	a5,8(a3)
+			tsajoystick[0] = 0;
+     694:	00c60793          	addi	a5,a2,12
+     698:	00078023          	sb	zero,0(a5)
+			tsajoystick[2] = 0;
+     69c:	00078123          	sb	zero,2(a5)
+            tocust = 0;
+     6a0:	80018aa3          	sb	zero,-2027(gp) # 20000015 <tocust>
+            kochange = 0;
+     6a4:	80018b23          	sb	zero,-2026(gp) # 20000016 <kochange>
+		}
+		if (tonext == 3) 
+     6a8:	0086c703          	lbu	a4,8(a3)
+     6ac:	478d                	li	a5,3
+     6ae:	00f71e63          	bne	a4,a5,6ca <usb_pid_handle_in+0xba>
+		{
+            tsajoystick[0] = 0;
+     6b2:	00c60793          	addi	a5,a2,12
+     6b6:	00078023          	sb	zero,0(a5)
+            tsajoystick[2] = 0;
+     6ba:	00078123          	sb	zero,2(a5)
+			tonext = 0;
+     6be:	00068423          	sb	zero,8(a3)
+			kochange = 0;
+     6c2:	80018b23          	sb	zero,-2026(gp) # 20000016 <kochange>
+            tocust = 0;
+     6c6:	80018aa3          	sb	zero,-2027(gp) # 20000015 <tocust>
+		}
+		if (tostr[i] && tonext == 0)
+     6ca:	8181a283          	lw	t0,-2024(gp) # 20000018 <i>
+     6ce:	4782                	lw	a5,0(sp)
+     6d0:	9796                	add	a5,a5,t0
+     6d2:	07c7c783          	lbu	a5,124(a5)
+     6d6:	c7a5                	beqz	a5,73e <usb_pid_handle_in+0x12e>
+     6d8:	0086c703          	lbu	a4,8(a3)
+     6dc:	e32d                	bnez	a4,73e <usb_pid_handle_in+0x12e>
+		{
+			bitclear(tsajoystick[0], 1);
+     6de:	00c60593          	addi	a1,a2,12
+     6e2:	0005c703          	lbu	a4,0(a1)
+			if (tostr[i] >= 'a' && tostr[i] <= 'z') //알파벳소문자
+     6e6:	f9f78413          	addi	s0,a5,-97
+     6ea:	20000537          	lui	a0,0x20000
+			bitclear(tsajoystick[0], 1);
+     6ee:	0fd77713          	andi	a4,a4,253
+     6f2:	00e58023          	sb	a4,0(a1)
+			if (tostr[i] >= 'a' && tostr[i] <= 'z') //알파벳소문자
+     6f6:	0ff47413          	andi	s0,s0,255
+     6fa:	44e5                	li	s1,25
+     6fc:	00c50513          	addi	a0,a0,12 # 2000000c <tsajoystick.0>
+     700:	0084e763          	bltu	s1,s0,70e <usb_pid_handle_in+0xfe>
+			{
+				tsajoystick[2] = 4 + tostr[i] - 'a';
+     704:	fa378793          	addi	a5,a5,-93
+			{
+				tsajoystick[2] = 4 + tostr[i] - 'A';
+				bitset(tsajoystick[0], 1);
+			}
+			else if (tostr[i] >= '1' && tostr[i] <= '9') //숫자1~9
+				tsajoystick[2] = 0x1E + tostr[i] - '1';
+     708:	00f58123          	sb	a5,2(a1)
+     70c:	a839                	j	72a <usb_pid_handle_in+0x11a>
+			if (tostr[i] >= 'A' && tostr[i] <= 'Z') //알파벳대문자
+     70e:	fbf78413          	addi	s0,a5,-65
+     712:	0ff47413          	andi	s0,s0,255
+     716:	0684eb63          	bltu	s1,s0,78c <usb_pid_handle_in+0x17c>
+				tsajoystick[2] = 4 + tostr[i] - 'A';
+     71a:	fc378793          	addi	a5,a5,-61
+				bitset(tsajoystick[0], 1);
+     71e:	00276713          	ori	a4,a4,2
+				tsajoystick[2] = 4 + tostr[i] - 'A';
+     722:	00f58123          	sb	a5,2(a1)
+				bitset(tsajoystick[0], 1);
+     726:	00e58023          	sb	a4,0(a1)
+            else if (tostr[i] == '~') //특문~
+            {
+                tsajoystick[2] = 0x35;
+                bitset(tsajoystick[0], 1);
+            }
+			tonext = 1;
+     72a:	4785                	li	a5,1
+     72c:	00f68423          	sb	a5,8(a3)
+			tostr[i] = 0;
+     730:	4782                	lw	a5,0(sp)
+     732:	9796                	add	a5,a5,t0
+			i++;
+     734:	0285                	addi	t0,t0,1
+			tostr[i] = 0;
+     736:	06078e23          	sb	zero,124(a5)
+			i++;
+     73a:	8051ac23          	sw	t0,-2024(gp) # 20000018 <i>
+		}
+        if (tocust && tonext == 0)
+     73e:	8151c783          	lbu	a5,-2027(gp) # 20000015 <tocust>
+     742:	cb99                	beqz	a5,758 <usb_pid_handle_in+0x148>
+     744:	0086c703          	lbu	a4,8(a3)
+     748:	eb01                	bnez	a4,758 <usb_pid_handle_in+0x148>
+        {
+            tsajoystick[2] = tocust;
+     74a:	00c60713          	addi	a4,a2,12
+     74e:	00f70123          	sb	a5,2(a4)
+            tonext = 1;
+     752:	4785                	li	a5,1
+     754:	00f68423          	sb	a5,8(a3)
+        }
+		if (kochange==1 && tonext == 0)
+     758:	8161c703          	lbu	a4,-2026(gp) # 20000016 <kochange>
+     75c:	4785                	li	a5,1
+     75e:	02f71263          	bne	a4,a5,782 <usb_pid_handle_in+0x172>
+     762:	0086c783          	lbu	a5,8(a3)
+     766:	ef91                	bnez	a5,782 <usb_pid_handle_in+0x172>
+		{
+			bitset(tsajoystick[0], 6);
+     768:	00c60613          	addi	a2,a2,12
+     76c:	00064783          	lbu	a5,0(a2)
+			tonext = 1;
+     770:	00e68423          	sb	a4,8(a3)
+			bitset(tsajoystick[0], 6);
+     774:	0407e793          	ori	a5,a5,64
+     778:	00f60023          	sb	a5,0(a2)
+            kochange = 2;
+     77c:	4789                	li	a5,2
+     77e:	80f18b23          	sb	a5,-2026(gp) # 20000016 <kochange>
+	}
+	else
+	{
+		usb_send_data( sendnow, tosend, 0, sendtok );
+	}
+}
+     782:	40b2                	lw	ra,12(sp)
+     784:	4422                	lw	s0,8(sp)
+     786:	4492                	lw	s1,4(sp)
+     788:	0141                	addi	sp,sp,16
+     78a:	8082                	ret
+			else if (tostr[i] >= '1' && tostr[i] <= '9') //숫자1~9
+     78c:	fcf78413          	addi	s0,a5,-49
+     790:	0ff47413          	andi	s0,s0,255
+     794:	44a1                	li	s1,8
+     796:	0084e463          	bltu	s1,s0,79e <usb_pid_handle_in+0x18e>
+				tsajoystick[2] = 0x1E + tostr[i] - '1';
+     79a:	17b5                	addi	a5,a5,-19
+     79c:	b7b5                	j	708 <usb_pid_handle_in+0xf8>
+			else if (tostr[i] == '0') //숫자0
+     79e:	03000413          	li	s0,48
+     7a2:	00879563          	bne	a5,s0,7ac <usb_pid_handle_in+0x19c>
+				tsajoystick[2] = 0x27;
+     7a6:	02700793          	li	a5,39
+     7aa:	bfb9                	j	708 <usb_pid_handle_in+0xf8>
+			else if (tostr[i] == '/') //특문/
+     7ac:	02f00413          	li	s0,47
+     7b0:	00879563          	bne	a5,s0,7ba <usb_pid_handle_in+0x1aa>
+				tsajoystick[2] = 0x38;
+     7b4:	03800793          	li	a5,56
+     7b8:	bf81                	j	708 <usb_pid_handle_in+0xf8>
+			else if (tostr[i] == ' ') //띄어쓰기
+     7ba:	02000413          	li	s0,32
+     7be:	00879563          	bne	a5,s0,7c8 <usb_pid_handle_in+0x1b8>
+				tsajoystick[2] = 0x2C;
+     7c2:	02c00793          	li	a5,44
+     7c6:	b789                	j	708 <usb_pid_handle_in+0xf8>
+            else if (tostr[i] == '\n') //줄바꿈
+     7c8:	4429                	li	s0,10
+     7ca:	00879563          	bne	a5,s0,7d4 <usb_pid_handle_in+0x1c4>
+                tsajoystick[2] = 0x28;
+     7ce:	02800793          	li	a5,40
+     7d2:	bf1d                	j	708 <usb_pid_handle_in+0xf8>
+            else if (tostr[i] == '!') //특문!
+     7d4:	02100593          	li	a1,33
+     7d8:	00b79a63          	bne	a5,a1,7ec <usb_pid_handle_in+0x1dc>
+                tsajoystick[2] = 0x1E;
+     7dc:	47f9                	li	a5,30
+                bitset(tsajoystick[0], 1);
+     7de:	00276713          	ori	a4,a4,2
+                tsajoystick[2] = 0x35;
+     7e2:	00f50123          	sb	a5,2(a0)
+                bitset(tsajoystick[0], 1);
+     7e6:	00e50023          	sb	a4,0(a0)
+     7ea:	b781                	j	72a <usb_pid_handle_in+0x11a>
+            else if (tostr[i] == '?') //특문?
+     7ec:	03f00593          	li	a1,63
+     7f0:	00b79563          	bne	a5,a1,7fa <usb_pid_handle_in+0x1ea>
+                tsajoystick[2] = 0x38;
+     7f4:	03800793          	li	a5,56
+     7f8:	b7dd                	j	7de <usb_pid_handle_in+0x1ce>
+            else if (tostr[i] == '~') //특문~
+     7fa:	07e00593          	li	a1,126
+     7fe:	f2b796e3          	bne	a5,a1,72a <usb_pid_handle_in+0x11a>
+                tsajoystick[2] = 0x35;
+     802:	03500793          	li	a5,53
+     806:	bfe1                	j	7de <usb_pid_handle_in+0x1ce>
+	int offset = (e->count)<<3;
+     808:	4f48                	lw	a0,28(a4)
+	sendnow = tsend + offset;
+     80a:	5f1c                	lw	a5,56(a4)
+	tosend = (int)e->max_len - offset;
+     80c:	574c                	lw	a1,44(a4)
+	int offset = (e->count)<<3;
+     80e:	050e                	slli	a0,a0,0x3
+	tosend = (int)e->max_len - offset;
+     810:	8d89                	sub	a1,a1,a0
+	sendnow = tsend + offset;
+     812:	953e                	add	a0,a0,a5
+	if( tosend > ENDPOINT0_SIZE ) tosend = ENDPOINT0_SIZE;
+     814:	47a1                	li	a5,8
+     816:	00b7c663          	blt	a5,a1,822 <usb_pid_handle_in+0x212>
+	if( tosend <= 0 )
+     81a:	00b04563          	bgtz	a1,824 <usb_pid_handle_in+0x214>
+		usb_send_empty( sendtok );
+     81e:	8536                	mv	a0,a3
+     820:	aea1                	j	b78 <usb_send_empty>
+	if( tosend > ENDPOINT0_SIZE ) tosend = ENDPOINT0_SIZE;
+     822:	45a1                	li	a1,8
+		usb_send_data( sendnow, tosend, 0, sendtok );
+     824:	4601                	li	a2,0
+     826:	a685                	j	b86 <usb_send_data>
+
+00000828 <usb_pid_handle_data>:
+}
+
+void usb_pid_handle_data( uint32_t this_token, uint8_t * data, uint32_t which_data, uint32_t length, struct rv003usb_internal * ist )
+{
+	//Received data from host.
+	int epno = ist->current_endpoint;
+     828:	431c                	lw	a5,0(a4)
+
+	length -= 3;
+	uint8_t * data_in = __builtin_assume_aligned( data, 4 );
+
+	// Alrady received this packet.
+	if( e->toggle_out != which_data )
+     82a:	0796                	slli	a5,a5,0x5
+     82c:	97ba                	add	a5,a5,a4
+     82e:	53d4                	lw	a3,36(a5)
+     830:	06c69a63          	bne	a3,a2,8a4 <usb_pid_handle_data+0x7c>
+	{
+		goto just_ack;
+	}
+
+	e->toggle_out = !e->toggle_out;
+     834:	0016b693          	seqz	a3,a3
+     838:	d3d4                	sw	a3,36(a5)
+#endif
+	}
+	else
+#endif
+
+	if( ist->setup_request )
+     83a:	4714                	lw	a3,8(a4)
+     83c:	c6a5                	beqz	a3,8a4 <usb_pid_handle_data+0x7c>
+		}
+#endif
+
+		struct usb_urb * s = __builtin_assume_aligned( (struct usb_urb *)(data_in), 4 );
+
+		uint32_t wvi = s->lValueLSBIndexMSB;
+     83e:	0045d683          	lhu	a3,4(a1)
+     842:	0025d603          	lhu	a2,2(a1)
+		uint32_t wLength = s->wLength;
+     846:	0065d503          	lhu	a0,6(a1)
+		uint32_t wvi = s->lValueLSBIndexMSB;
+     84a:	06c2                	slli	a3,a3,0x10
+     84c:	8ed1                	or	a3,a3,a2
+		//int bRequest = s->wRequestTypeLSBRequestMSB >> 8;
+
+		// We shift down because we don't care if USB_RECIP_INTERFACE is set or not.
+		// Otherwise we have to write extra code to handle each case if it's set or
+		// not set, but in general, there's never a situation where we realy care.
+		uint32_t reqShl = s->wRequestTypeLSBRequestMSB >> 1;
+     84e:	0005d603          	lhu	a2,0(a1)
+		e->count = 0;
+     852:	0007ae23          	sw	zero,28(a5)
+		e->opaque = 0;
+     856:	0207ac23          	sw	zero,56(a5)
+		e->custom = 0;
+     85a:	0207a423          	sw	zero,40(a5)
+		e->max_len = 0;
+     85e:	0207a623          	sw	zero,44(a5)
+		ist->setup_request = 0;
+     862:	00072423          	sw	zero,8(a4)
+		uint32_t reqShl = s->wRequestTypeLSBRequestMSB >> 1;
+     866:	8205                	srli	a2,a2,0x1
+			// Class request (Will be writing)  This is hid_send_feature_report
+			usb_handle_hid_set_report_start( e, wLength, wvi );
+		}
+		else
+#endif
+		if( reqShl == (0x0680>>1) ) // GET_DESCRIPTOR = 6 (msb)
+     868:	34000593          	li	a1,832
+     86c:	04b61263          	bne	a2,a1,8b0 <usb_pid_handle_data+0x88>
+     870:	6705                	lui	a4,0x1
+     872:	d4870713          	addi	a4,a4,-696 # d48 <descriptor_list>
+     876:	06070593          	addi	a1,a4,96
+				if( dl->lIndexValue == wvi )
+				{
+					e->opaque = (uint8_t*)dl->addr;
+					uint16_t swLen = wLength;
+					uint16_t elLen = dl->length;
+					e->max_len = (swLen < elLen)?swLen:elLen;
+     87a:	832a                	mv	t1,a0
+				if( dl->lIndexValue == wvi )
+     87c:	4310                	lw	a2,0(a4)
+     87e:	02d61063          	bne	a2,a3,89e <usb_pid_handle_data+0x76>
+					e->opaque = (uint8_t*)dl->addr;
+     882:	4350                	lw	a2,4(a4)
+     884:	df90                	sw	a2,56(a5)
+					uint16_t elLen = dl->length;
+     886:	00874603          	lbu	a2,8(a4)
+					e->max_len = (swLen < elLen)?swLen:elLen;
+     88a:	01061293          	slli	t0,a2,0x10
+     88e:	0102d293          	srli	t0,t0,0x10
+     892:	00557363          	bgeu	a0,t0,898 <usb_pid_handle_data+0x70>
+     896:	861a                	mv	a2,t1
+     898:	0642                	slli	a2,a2,0x10
+     89a:	8241                	srli	a2,a2,0x10
+     89c:	d7d0                	sw	a2,44(a5)
+			for( i = 0; i < DESCRIPTOR_LIST_ENTRIES; i++ )
+     89e:	0731                	addi	a4,a4,12
+     8a0:	fcb71ee3          	bne	a4,a1,87c <usb_pid_handle_data+0x54>
+		}
+	}
+just_ack:
+	{
+		//Got the right data.  Acknowledge.
+		usb_send_data( 0, 0, 2, 0xD2 ); // Send ACK
+     8a4:	0d200693          	li	a3,210
+     8a8:	4609                	li	a2,2
+     8aa:	4581                	li	a1,0
+     8ac:	4501                	li	a0,0
+     8ae:	ace1                	j	b86 <usb_send_data>
+		else if( reqShl == (0x0500>>1) ) // SET_ADDRESS = 0x05
+     8b0:	28000793          	li	a5,640
+     8b4:	fef618e3          	bne	a2,a5,8a4 <usb_pid_handle_data+0x7c>
+			ist->my_address = wvi;
+     8b8:	c354                	sw	a3,4(a4)
+     8ba:	b7ed                	j	8a4 <usb_pid_handle_data+0x7c>
+
+000008bc <EXTI7_0_IRQHandler>:
+
+.section .text.vector_handler
+.global EXTI7_0_IRQHandler
+.balign 4
+EXTI7_0_IRQHandler:
+	addi	sp,sp,-80
+     8bc:	715d                	addi	sp,sp,-80
+	sw	a0, 0(sp)
+     8be:	c02a                	sw	a0,0(sp)
+	sw	a5, 20(sp)
+     8c0:	ca3e                	sw	a5,20(sp)
+	la a5, USB_GPIO_BASE
+     8c2:	400117b7          	lui	a5,0x40011
+     8c6:	40078793          	addi	a5,a5,1024 # 40011400 <__global_pointer$+0x20010c00>
+	c.lw a0, INDR_OFFSET(a5) // MUST check SE0 immediately.
+     8ca:	4788                	lw	a0,8(a5)
+	c.andi a0, USB_DMASK
+     8cc:	8961                	andi	a0,a0,24
+
+	sw	a1, 4(sp)
+     8ce:	c22e                	sw	a1,4(sp)
+	sw	a2, 8(sp)
+     8d0:	c432                	sw	a2,8(sp)
+	sw	a3, 12(sp)
+     8d2:	c636                	sw	a3,12(sp)
+	sw	a4, 16(sp)
+     8d4:	c83a                	sw	a4,16(sp)
+	sw	s1, 28(sp)
+     8d6:	ce26                	sw	s1,28(sp)
+
+	SAVE_DEBUG_MARKER( 48 );
+     8d8:	d812                	sw	tp,48(sp)
+	DEBUG_TICK_SETUP
+     8da:	40013237          	lui	tp,0x40013
+     8de:	c5820213          	addi	tp,tp,-936 # 40012c58 <__global_pointer$+0x20012458>
+	c.lw a1, INDR_OFFSET(a5)
+     8e2:	478c                	lw	a1,8(a5)
+	c.andi a1, USB_DMASK;
+     8e4:	89e1                	andi	a1,a1,24
+
+	// Finish jump to se0
+	c.beqz a0, handle_se0_keepalive
+     8e6:	22050963          	beqz	a0,b18 <handle_se0_keepalive>
+
+	c.lw a0, INDR_OFFSET(a5); c.andi a0, USB_DMASK; bne a0, a1, syncout
+     8ea:	4788                	lw	a0,8(a5)
+     8ec:	8961                	andi	a0,a0,24
+     8ee:	02b51b63          	bne	a0,a1,924 <syncout>
+	c.lw a0, INDR_OFFSET(a5); c.andi a0, USB_DMASK; bne a0, a1, syncout
+     8f2:	4788                	lw	a0,8(a5)
+     8f4:	8961                	andi	a0,a0,24
+     8f6:	02b51763          	bne	a0,a1,924 <syncout>
+	c.lw a0, INDR_OFFSET(a5); c.andi a0, USB_DMASK; bne a0, a1, syncout
+     8fa:	4788                	lw	a0,8(a5)
+     8fc:	8961                	andi	a0,a0,24
+     8fe:	02b51363          	bne	a0,a1,924 <syncout>
+	c.lw a0, INDR_OFFSET(a5); c.andi a0, USB_DMASK; bne a0, a1, syncout
+     902:	4788                	lw	a0,8(a5)
+     904:	8961                	andi	a0,a0,24
+     906:	00b51f63          	bne	a0,a1,924 <syncout>
+	c.lw a0, INDR_OFFSET(a5); c.andi a0, USB_DMASK; bne a0, a1, syncout
+     90a:	4788                	lw	a0,8(a5)
+     90c:	8961                	andi	a0,a0,24
+     90e:	00b51b63          	bne	a0,a1,924 <syncout>
+	c.lw a0, INDR_OFFSET(a5); c.andi a0, USB_DMASK; bne a0, a1, syncout
+     912:	4788                	lw	a0,8(a5)
+     914:	8961                	andi	a0,a0,24
+     916:	00b51763          	bne	a0,a1,924 <syncout>
+	c.lw a0, INDR_OFFSET(a5); c.andi a0, USB_DMASK; bne a0, a1, syncout
+     91a:	4788                	lw	a0,8(a5)
+     91c:	8961                	andi	a0,a0,24
+     91e:	00b51363          	bne	a0,a1,924 <syncout>
+	c.j syncout
+     922:	a009                	j	924 <syncout>
+
+00000924 <syncout>:
+syncout:
+	sw	s0, 24(sp)
+     924:	cc22                	sw	s0,24(sp)
+	li a2, 0
+     926:	4601                	li	a2,0
+	sw	t0, 32(sp)  // XXX NOTE: This is actually unused register - remove some day?
+     928:	d016                	sw	t0,32(sp)
+	sw	t1, 36(sp)
+     92a:	d21a                	sw	t1,36(sp)
+
+0000092c <preamble_loop>:
+	
+	// This is actually somewhat late.
+	// The preamble loop should try to make it earlier.
+.balign 4
+preamble_loop:
+	DEBUG_TICK_MARK
+     92c:	00022023          	sw	zero,0(tp) # 0 <InterruptVector>
+	c.lw a0, INDR_OFFSET(a5);
+     930:	4788                	lw	a0,8(a5)
+	c.andi a0, USB_DMASK;
+     932:	8961                	andi	a0,a0,24
+	c.beqz a0, done_usb_message // SE0 here?
+     934:	18050163          	beqz	a0,ab6 <done_usb_message>
+	c.xor a0, a1;
+     938:	8d2d                	xor	a0,a0,a1
+	c.xor a1, a0; // Recover a1.
+     93a:	8da9                	xor	a1,a1,a0
+	j 1f; 1: // 4 cycles?
+     93c:	a009                	j	93e <preamble_loop+0x12>
+	c.beqz a0, done_preamble
+     93e:	c909                	beqz	a0,950 <done_preamble>
+	j 1f; 1: // 4 cycles?
+     940:	a009                	j	942 <preamble_loop+0x16>
+	c.lw s0, INDR_OFFSET(a5);
+     942:	4780                	lw	s0,8(a5)
+	c.andi s0, USB_DMASK;
+     944:	8861                	andi	s0,s0,24
+	c.xor s0, a1
+     946:	8c2d                	xor	s0,s0,a1
+
+	// TRICKY: This helps retime the USB sync.
+	// If s0 is nonzero, then it's changed (we're going too slow)
+	c.bnez s0, 2f;  // This code takes 6 cycles or 8 cycles, depending.
+     948:	e011                	bnez	s0,94c <preamble_loop+0x20>
+	c.j 1f; 1:
+     94a:	a009                	j	94c <preamble_loop+0x20>
+	2:
+	j preamble_loop // 4 cycles
+     94c:	b7c5                	j	92c <preamble_loop>
+     94e:	0001                	nop
+
+00000950 <done_preamble>:
+.balign 4
+done_preamble:
+	sw  t2, 40(sp)
+     950:	d41e                	sw	t2,40(sp)
+	sw  ra, 52(sp)
+     952:	da06                	sw	ra,52(sp)
+	// 16-byte temporary buffer at 56+sp
+
+	// XXX TODO: Do one byte here to determine the header byte and from that set the CRC.
+	c.li s1, 8
+     954:	44a1                	li	s1,8
+
+	// This is the first bit that matters.
+	c.li s0, 6 // 1 runs.
+     956:	4419                	li	s0,6
+
+	c.nop; 
+     958:	0001                	nop
+     95a:	0001                	nop
+
+0000095c <packet_type_loop>:
+packet_type_loop:
+	// Up here to delay loop a tad, and we need to execute them anyway.
+	// TODO: Maybe we could further sync bits here instead of take up time?
+	// I.e. can we do what we're doing above, here, and take less time, but sync
+	// up when possible.
+	li a3, 0xffff // Starting CRC of 0.   Because USB doesn't respect reverse CRCing.
+     95c:	66c1                	lui	a3,0x10
+     95e:	16fd                	addi	a3,a3,-1
+	li a4, 0xa001
+     960:	6729                	lui	a4,0xa
+     962:	0705                	addi	a4,a4,1
+	addi  t2, sp, DATA_PTR_OFFSET //rv003usb_internal_data
+     964:	03f10393          	addi	t2,sp,63
+	la  t0, 0x80
+     968:	08000293          	li	t0,128
+	c.nop
+     96c:	0001                	nop
+     96e:	0001                	nop
+
+	DEBUG_TICK_MARK
+     970:	00022023          	sw	zero,0(tp) # 0 <InterruptVector>
+	c.lw a0, INDR_OFFSET(a5);
+     974:	4788                	lw	a0,8(a5)
+	c.andi a0, USB_DMASK;
+     976:	8961                	andi	a0,a0,24
+	c.beqz a0, done_usb_message // Not se0 complete, that can't happen here and be valid.
+     978:	12050f63          	beqz	a0,ab6 <done_usb_message>
+	c.xor a0, a1;
+     97c:	8d2d                	xor	a0,a0,a1
+	c.xor a1, a0; // Recover a1, for next cycle
+     97e:	8da9                	xor	a1,a1,a0
+
+	// No CRC for the header.
+	//c.srli a0, USB_DM
+	//c.addi a0, 1 // 00 -> 1, 11 -> 100
+	//c.andi a0, 1 // If 1, 1 if 0, 0
+        c.nop
+     980:	0001                	nop
+        seqz a0, a0
+     982:	00153513          	seqz	a0,a0
+
+	// Write header into byte in reverse order, because we can.
+	c.slli a2, 1
+     986:	0606                	slli	a2,a2,0x1
+	c.or a2, a0
+     988:	8e49                	or	a2,a2,a0
+
+	// Handle bit stuffing rules.
+	c.addi a0, -1 // 0->0xffffffff 1->0
+     98a:	157d                	addi	a0,a0,-1
+	c.or s0, a0
+     98c:	8c49                	or	s0,s0,a0
+	c.andi s0, 7
+     98e:	881d                	andi	s0,s0,7
+	c.addi s0, -1
+     990:	147d                	addi	s0,s0,-1
+	c.addi s1, -1
+     992:	14fd                	addi	s1,s1,-1
+	c.bnez s1, packet_type_loop
+     994:	f4e1                	bnez	s1,95c <packet_type_loop>
+///////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////	
+
+	// XXX Here, figure out CRC polynomial.
+
+	li s1, (USB_BUFFER_SIZE*8) // # of bits we culd read.
+     996:	06000493          	li	s1,96
+	//
+	// When we get here, packet type is loaded in A2.
+	// If packet type is 0xXX01 or 0xXX11
+	// the LSBs are the inverted packet type.
+	// we can branch off of bit 2.
+	andi a0, a2, 0x0c
+     99a:	00c67513          	andi	a0,a2,12
+
+	// if a0 is 1 then it's DATA (full CRC) otheriwse,
+	// (0) for setup or PARTIAL CRC.
+	// Careful:  This has to take a constant amount of time either way the branch goes.
+	c.beqz a0, data_crc
+     99e:	c509                	beqz	a0,9a8 <data_crc>
+	c.li a4, 0x14	
+     9a0:	4751                	li	a4,20
+	c.li a3, 0x1e
+     9a2:	46f9                	li	a3,30
+     9a4:	00000013          	nop
+
+000009a8 <data_crc>:
+
+///////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////	
+.balign 4
+is_end_of_byte:
+	HANDLE_EOB_YES
+     9a8:	00c38023          	sb	a2,0(t2)
+     9ac:	00138393          	addi	t2,t2,1
+
+000009b0 <bit_process>:
+	// end-of-byte.
+.balign 4
+bit_process:
+	// Debug blip
+//	c.lw a4, INDR_OFFSET(a5);
+	DEBUG_TICK_MARK
+     9b0:	00022023          	sw	zero,0(tp) # 0 <InterruptVector>
+	c.lw a0, INDR_OFFSET(a5);
+     9b4:	4788                	lw	a0,8(a5)
+	c.andi a0, USB_DMASK;
+     9b6:	8961                	andi	a0,a0,24
+	c.xor a0, a1;
+     9b8:	8d2d                	xor	a0,a0,a1
+#define HANDLE_NEXT_BYTE(is_end_of_byte, jumptype)  \
+	c.addi s1, -1; \
+	andi a0, s1, 7; /* s1 could be really really big */ \
+	c.jumptype a0, is_end_of_byte /* 4 cycles for this section. (Checked) (Sometimes 5)? */ 
+
+	c.beqz a0, handle_one_bit
+     9ba:	c50d                	beqz	a0,9e4 <handle_one_bit>
+
+000009bc <handle_zero_bit>:
+handle_zero_bit:
+	c.xor a1, a0; // Recover a1, for next cycle
+     9bc:	8da9                	xor	a1,a1,a0
+	// TODO: Do we have time to do time fixup here?
+	// Can we resync time here?
+	// If they are different, we need to sloowwww dowwwnnn
+	// There is some free time.  Could do something interesting here!!!
+	// I was thinking we could put the resync code here.
+	c.j 1f; 1:  //Delay 4 cycles.
+     9be:	a009                	j	9c0 <handle_zero_bit+0x4>
+
+	c.li s0, 6      // reset runs-of-one.
+     9c0:	4419                	li	s0,6
+	c.beqz a1, se0_complete
+     9c2:	c9bd                	beqz	a1,a38 <se0_complete>
+
+	// Handle CRC (0 bit)  (From @Domkeykong)
+	slli a0,a3,31 // Put a3s LSB into a0s MSB
+     9c4:	01f69513          	slli	a0,a3,0x1f
+	c.srai a0,31    // Copy MSB into all other bits
+     9c8:	857d                	srai	a0,a0,0x1f
+	c.srli a3,1
+     9ca:	8285                	srli	a3,a3,0x1
+	c.and  a0, a4
+     9cc:	8d79                	and	a0,a0,a4
+	c.xor  a3, a0
+     9ce:	8ea9                	xor	a3,a3,a0
+
+	c.srli a2, 1;  // shift a2 down by 1
+     9d0:	8205                	srli	a2,a2,0x1
+	HANDLE_NEXT_BYTE(is_end_of_byte, beqz)
+     9d2:	14fd                	addi	s1,s1,-1
+     9d4:	0074f513          	andi	a0,s1,7
+     9d8:	d961                	beqz	a0,9a8 <data_crc>
+	c.nop
+     9da:	0001                	nop
+	c.nop
+     9dc:	0001                	nop
+	c.nop
+     9de:	0001                	nop
+	c.bnez s1, bit_process // + 4 cycles
+     9e0:	f8e1                	bnez	s1,9b0 <bit_process>
+	c.j done_usb_message
+     9e2:	a8d1                	j	ab6 <done_usb_message>
+
+000009e4 <handle_one_bit>:
+
+
+.balign 4
+handle_one_bit:
+	c.addi s0, -1; // Count # of runs of 1 (subtract 1)
+     9e4:	147d                	addi	s0,s0,-1
+	//HANDLE_CRC (1 bit)
+	andi a0, a3, 1
+     9e6:	0016f513          	andi	a0,a3,1
+	c.addi a0, -1
+     9ea:	157d                	addi	a0,a0,-1
+	c.and a0, a4
+     9ec:	8d79                	and	a0,a0,a4
+	c.srli a3, 1
+     9ee:	8285                	srli	a3,a3,0x1
+	c.xor a3, a0
+     9f0:	8ea9                	xor	a3,a3,a0
+
+	c.srli a2, 1;  // shift a2 down by 1
+     9f2:	8205                	srli	a2,a2,0x1
+	ori a2, a2, 0x80
+     9f4:	08066613          	ori	a2,a2,128
+	c.beqz s0, handle_bit_stuff;
+     9f8:	c811                	beqz	s0,a0c <handle_bit_stuff>
+
+	HANDLE_NEXT_BYTE(is_end_of_byte, beqz)
+     9fa:	14fd                	addi	s1,s1,-1
+     9fc:	0074f513          	andi	a0,s1,7
+     a00:	d545                	beqz	a0,9a8 <data_crc>
+	c.nop // Need extra delay here because we need more time if it's end-of-byte.
+     a02:	0001                	nop
+	c.nop
+     a04:	0001                	nop
+	c.nop
+     a06:	0001                	nop
+	c.bnez s1, bit_process // + 4 cycles
+     a08:	f4c5                	bnez	s1,9b0 <bit_process>
+	c.j done_usb_message
+     a0a:	a075                	j	ab6 <done_usb_message>
+
+00000a0c <handle_bit_stuff>:
+
+handle_bit_stuff:
+	// We want to wait a little bit, then read another byte, and make
+	// sure everything is well, before heading back into the main loop
+	// Debug blip
+	HANDLE_NEXT_BYTE(not_is_end_of_byte_and_bit_stuffed, bnez)
+     a0c:	14fd                	addi	s1,s1,-1
+     a0e:	0074f513          	andi	a0,s1,7
+     a12:	e509                	bnez	a0,a1c <not_is_end_of_byte_and_bit_stuffed>
+	HANDLE_EOB_YES
+     a14:	00c38023          	sb	a2,0(t2)
+     a18:	00138393          	addi	t2,t2,1
+
+00000a1c <not_is_end_of_byte_and_bit_stuffed>:
+
+not_is_end_of_byte_and_bit_stuffed:
+        DEBUG_TICK_MARK
+     a1c:	00022023          	sw	zero,0(tp) # 0 <InterruptVector>
+	c.lw a0, INDR_OFFSET(a5);
+     a20:	4788                	lw	a0,8(a5)
+	c.andi a0, USB_DMASK;
+     a22:	8961                	andi	a0,a0,24
+	c.beqz a0, se0_complete
+     a24:	c911                	beqz	a0,a38 <se0_complete>
+	c.xor a0, a1;
+     a26:	8d2d                	xor	a0,a0,a1
+	c.xor a1, a0; // Recover a1, for next cycle.
+     a28:	8da9                	xor	a1,a1,a0
+
+	// If A0 is a 0 then that's bad, we just did a bit stuff
+        //   and A0 == 0 means there was no signal transition
+	c.beqz a0, done_usb_message
+     a2a:	c551                	beqz	a0,ab6 <done_usb_message>
+
+        // Reset bit stuff, delay, then continue onto the next actual bit
+	c.li s0, 6;
+     a2c:	4419                	li	s0,6
+
+        c.nop;
+     a2e:	0001                	nop
+	nx6p3delay( 2, a0 )
+     a30:	450d                	li	a0,3
+     a32:	157d                	addi	a0,a0,-1
+     a34:	fd7d                	bnez	a0,a32 <not_is_end_of_byte_and_bit_stuffed+0x16>
+
+	c.bnez s1, bit_process // + 4 cycles
+     a36:	fcad                	bnez	s1,9b0 <bit_process>
+
+00000a38 <se0_complete>:
+
+.balign 4
+se0_complete:
+	// This is triggered when we finished getting a packet.
+	andi a0, s1, 7; // Make sure we received an even number of bytes.
+     a38:	0074f513          	andi	a0,s1,7
+	c.bnez a0, done_usb_message
+     a3c:	ed2d                	bnez	a0,ab6 <done_usb_message>
+
+
+	// Special: handle ACKs?
+	// Now we have to decide what we're doing based on the
+	// packet type.
+	addi  a1, sp, DATA_PTR_OFFSET
+     a3e:	03f10593          	addi	a1,sp,63
+     a42:	2188                	fld	fa0,0(a1)
+	XW_C_LBU(a0, a1, 0);	//lbu  a0, 0(a1)
+	c.addi a1, 1
+     a44:	0585                	addi	a1,a1,1
+	// 1001 => 10010110 => PID IN
+	// 0001 => 10000111 => PID_OUT
+	// 1101 => 10110100 => SETUP    (OK)
+
+	// a0 contains first 4 bytes.
+	la ra, done_usb_message_in // Common return address for all function calls.
+     a46:	00000097          	auipc	ra,0x0
+     a4a:	07008093          	addi	ra,ra,112 # ab6 <done_usb_message>
+
+	// For ACK don't worry about CRC.
+	addi a5, a0, -0b01001011
+     a4e:	fb550793          	addi	a5,a0,-75
+
+	RESTORE_DEBUG_MARKER(48) // restore x4 for whatever in C land.
+     a52:	5242                	lw	tp,48(sp)
+
+	la a4, rv003usb_internal_data
+     a54:	1ffff717          	auipc	a4,0x1ffff
+     a58:	5d070713          	addi	a4,a4,1488 # 20000024 <rv003usb_internal_data>
+
+	// ACK doesn't need good CRC.
+	c.beqz a5, usb_pid_handle_ack
+     a5c:	c7c9                	beqz	a5,ae6 <usb_pid_handle_ack>
+
+	// Next, check for tokens.
+	c.bnez a3, crc_for_tokens_would_be_bad_maybe_data
+     a5e:	ea85                	bnez	a3,a8e <crc_for_tokens_would_be_bad_maybe_data>
+
+00000a60 <may_be_a_token>:
+     a60:	2192                	fld	ft3,256(sp)
+may_be_a_token:
+	// Our CRC is 0, so we might be a token.
+
+	// Do token-y things.
+	XW_C_LHU( a2, a1, 0 )
+	andi a0, a2, 0x7f // addr
+     a62:	07f67513          	andi	a0,a2,127
+	c.srli a2, 7
+     a66:	821d                	srli	a2,a2,0x7
+	c.andi a2, 0xf    // endp
+     a68:	8a3d                	andi	a2,a2,15
+	li s0, ENDPOINTS
+     a6a:	440d                	li	s0,3
+	bgeu a2, s0, done_usb_message // Make sure < ENDPOINTS
+     a6c:	04867563          	bgeu	a2,s0,ab6 <done_usb_message>
+	c.beqz a0,  yes_check_tokens
+     a70:	c501                	beqz	a0,a78 <yes_check_tokens>
+     a72:	2340                	fld	fs0,128(a4)
+	// Otherwise, we might have our assigned address.
+	XW_C_LBU(s0, a4, MY_ADDRESS_OFFSET_BYTES);	//	lbu s0, MY_ADDRESS_OFFSET_BYTES(a4)
+	bne s0, a0, done_usb_message // addr != 0 && addr != ours.
+     a74:	04a41163          	bne	s0,a0,ab6 <done_usb_message>
+
+00000a78 <yes_check_tokens>:
+yes_check_tokens:
+	addi a5, a5, (0b01001011-0b10000111)
+     a78:	fc478793          	addi	a5,a5,-60
+	c.beqz a5, usb_pid_handle_out
+     a7c:	cfc1                	beqz	a5,b14 <usb_pid_handle_out>
+	c.addi a5, (0b10000111-0b10010110)
+     a7e:	17c5                	addi	a5,a5,-15
+	c.beqz a5, usb_pid_handle_in
+     a80:	00079463          	bnez	a5,a88 <yes_check_tokens+0x10>
+     a84:	b8dff06f          	j	610 <usb_pid_handle_in>
+	c.addi a5, (0b10010110-0b10110100)
+     a88:	1789                	addi	a5,a5,-30
+	c.beqz a5, usb_pid_handle_setup
+     a8a:	cbb5                	beqz	a5,afe <usb_pid_handle_setup>
+
+	c.j done_usb_message_in
+     a8c:	a02d                	j	ab6 <done_usb_message>
+
+00000a8e <crc_for_tokens_would_be_bad_maybe_data>:
+
+	// CRC is nonzero. (Good for Data packets)
+crc_for_tokens_would_be_bad_maybe_data:
+	li s0, 0xb001  // UGH: You can't use the CRC16 in reverse :(
+     a8e:	642d                	lui	s0,0xb
+     a90:	0405                	addi	s0,s0,1
+	c.sub a3, s0
+     a92:	8e81                	sub	a3,a3,s0
+	c.bnez a3, done_usb_message_in
+     a94:	e28d                	bnez	a3,ab6 <done_usb_message>
+	// Good CRC!!
+	sub a3, t2, a1 //a3 = # of bytes read..
+     a96:	40b386b3          	sub	a3,t2,a1
+	c.addi a3, 1
+     a9a:	0685                	addi	a3,a3,1
+	addi a5, a5, (0b01001011-0b11000011)
+     a9c:	f8878793          	addi	a5,a5,-120
+	c.li a2, 0
+     aa0:	4601                	li	a2,0
+	c.beqz a5, usb_pid_handle_data
+     aa2:	00079463          	bnez	a5,aaa <crc_for_tokens_would_be_bad_maybe_data+0x1c>
+     aa6:	d83ff06f          	j	828 <usb_pid_handle_data>
+	c.addi a5, (0b11000011-0b11010010)
+     aaa:	17c5                	addi	a5,a5,-15
+	c.li a2, 1
+     aac:	4605                	li	a2,1
+	c.beqz a5, usb_pid_handle_data
+     aae:	00079463          	bnez	a5,ab6 <done_usb_message>
+     ab2:	d77ff06f          	j	828 <usb_pid_handle_data>
+
+00000ab6 <done_usb_message>:
+
+done_usb_message:
+done_usb_message_in:
+	lw	s0, 24(sp)
+     ab6:	4462                	lw	s0,24(sp)
+	lw	s1, 28(sp)
+     ab8:	44f2                	lw	s1,28(sp)
+	lw	t0, 32(sp)
+     aba:	5282                	lw	t0,32(sp)
+	lw	t1, 36(sp)
+     abc:	5312                	lw	t1,36(sp)
+	lw	t2, 40(sp)
+     abe:	53a2                	lw	t2,40(sp)
+	lw  ra, 52(sp)
+     ac0:	50d2                	lw	ra,52(sp)
+
+00000ac2 <ret_from_se0>:
+
+ret_from_se0:
+	lw	s1, 28(sp)
+     ac2:	44f2                	lw	s1,28(sp)
+	RESTORE_DEBUG_MARKER(48)
+     ac4:	5242                	lw	tp,48(sp)
+	lw	a2, 8(sp)
+     ac6:	4622                	lw	a2,8(sp)
+	lw	a3, 12(sp)
+     ac8:	46b2                	lw	a3,12(sp)
+	lw	a4, 16(sp)
+     aca:	4742                	lw	a4,16(sp)
+	lw	a1, 4(sp)
+     acc:	4592                	lw	a1,4(sp)
+
+00000ace <interrupt_complete>:
+
+interrupt_complete:
+	// Acknowledge interrupt.
+	// EXTI->INTFR = 1<<4
+	c.j 1f; 1: // Extra little bit of delay to make sure we don't accidentally false fire.
+     ace:	a009                	j	ad0 <interrupt_complete+0x2>
+
+	la a5, EXTI_BASE + 20
+     ad0:	400107b7          	lui	a5,0x40010
+     ad4:	41478793          	addi	a5,a5,1044 # 40010414 <__global_pointer$+0x2000fc14>
+	li a0, (1<<USB_DP)
+     ad8:	4541                	li	a0,16
+	sw a0, 0(a5)
+     ada:	c388                	sw	a0,0(a5)
+
+	// Restore stack.
+	lw	a0, 0(sp)
+     adc:	4502                	lw	a0,0(sp)
+	lw	a5, 20(sp)
+     ade:	47d2                	lw	a5,20(sp)
+	addi	sp,sp,80
+     ae0:	6161                	addi	sp,sp,80
+	mret
+     ae2:	30200073          	mret
+
+00000ae6 <usb_pid_handle_ack>:
+	return;
+}
+*/
+
+usb_pid_handle_ack:
+	c.lw a2, 0(a4) //ist->current_endpoint -> endp;
+     ae6:	4310                	lw	a2,0(a4)
+	c.slli a2, 5
+     ae8:	0616                	slli	a2,a2,0x5
+	c.add a2, a4
+     aea:	963a                	add	a2,a2,a4
+	c.addi a2, ENDP_OFFSET // usb_endpoint eps[ENDPOINTS];
+     aec:	0671                	addi	a2,a2,28
+
+	c.lw a0, (EP_TOGGLE_IN_OFFSET)(a2) // toggle_in=!toggle_in
+     aee:	4248                	lw	a0,4(a2)
+	c.li a1, 1
+     af0:	4585                	li	a1,1
+	c.xor a0, a1
+     af2:	8d2d                	xor	a0,a0,a1
+	c.sw a0, (EP_TOGGLE_IN_OFFSET)(a2)
+     af4:	c248                	sw	a0,4(a2)
+
+	c.lw a0, (EP_COUNT_OFFSET)(a2) // count_in
+     af6:	4208                	lw	a0,0(a2)
+	c.addi a0, 1
+     af8:	0505                	addi	a0,a0,1
+	c.sw a0, (EP_COUNT_OFFSET)(a2)
+     afa:	c208                	sw	a0,0(a2)
+
+	c.j done_usb_message_in
+     afc:	bf6d                	j	ab6 <done_usb_message>
+
+00000afe <usb_pid_handle_setup>:
+	e->count = 0;
+	e->toggle_in = 1;
+	ist->setup_request = 1;
+}*/
+usb_pid_handle_setup:
+	c.sw a2, 0(a4) // ist->current_endpoint = endp
+     afe:	c310                	sw	a2,0(a4)
+	c.li a1, 1
+     b00:	4585                	li	a1,1
+	c.sw a1, SETUP_REQUEST_OFFSET(a4) //ist->setup_request = 1;
+     b02:	c70c                	sw	a1,8(a4)
+	c.slli a2, 3+2
+     b04:	0616                	slli	a2,a2,0x5
+	c.add a2, a4
+     b06:	963a                	add	a2,a2,a4
+	c.sw a1, (ENDP_OFFSET+EP_TOGGLE_IN_OFFSET)(a2) //e->toggle_in = 1;
+     b08:	d20c                	sw	a1,32(a2)
+	c.li a1, 0
+     b0a:	4581                	li	a1,0
+	c.sw a1, (ENDP_OFFSET+EP_COUNT_OFFSET)(a2)  //e->count = 0;
+     b0c:	ce4c                	sw	a1,28(a2)
+	c.sw a1, (ENDP_OFFSET+EP_OPAQUE_OFFSET)(a2)  //e->opaque = 0;
+     b0e:	de0c                	sw	a1,56(a2)
+	c.sw a1, (ENDP_OFFSET+EP_TOGGLE_OUT_OFFSET)(a2) //e->toggle_out = 0;
+     b10:	d24c                	sw	a1,36(a2)
+	c.j done_usb_message_in	
+     b12:	b755                	j	ab6 <done_usb_message>
+
+00000b14 <usb_pid_handle_out>:
+     b14:	a310                	fsd	fa2,0(a4)
+//This will correctly swap back the endpoint.
+usb_pid_handle_out:
+	//void usb_pid_handle_out( uint32_t addr, uint8_t * data, uint32_t endp, uint32_t unused, struct rv003usb_internal * ist )	
+	//sb a2, 0(a4) //ist->current_endpoint = endp;
+	XW_C_SB( a2, a4, 0 ); // current_endpoint = endp
+	c.j done_usb_message_in
+     b16:	b745                	j	ab6 <done_usb_message>
+
+00000b18 <handle_se0_keepalive>:
+
+handle_se0_keepalive:
+	// In here, we want to do smart stuff with the
+	// 1ms tick.
+
+	la  a0, SYSTICK_CNT
+     b18:	e000f537          	lui	a0,0xe000f
+     b1c:	0521                	addi	a0,a0,8
+	la a4, rv003usb_internal_data
+     b1e:	1ffff717          	auipc	a4,0x1ffff
+     b22:	50670713          	addi	a4,a4,1286 # 20000024 <rv003usb_internal_data>
+	c.lw a1, LAST_SE0_OFFSET(a4) //last cycle count   last_se0_cyccount
+     b26:	4b0c                	lw	a1,16(a4)
+	c.lw a2, 0(a0) //this cycle count
+     b28:	4110                	lw	a2,0(a0)
+	c.sw a2, LAST_SE0_OFFSET(a4) //store it back to last_se0_cyccount
+     b2a:	cb10                	sw	a2,16(a4)
+	c.sub a2, a1
+     b2c:	8e0d                	sub	a2,a2,a1
+	c.sw a2, DELTA_SE0_OFFSET(a4) //record delta_se0_cyccount
+     b2e:	cb50                	sw	a2,20(a4)
+
+	li a1, 48000
+     b30:	65b1                	lui	a1,0xc
+     b32:	b8058593          	addi	a1,a1,-1152 # bb80 <rv003usb.c.8bef6ca7+0x97ce>
+	c.sub a2, a1
+     b36:	8e0d                	sub	a2,a2,a1
+	// This is our deviance from 48MHz.
+
+	// Make sure we aren't in left field.
+	li a5, 4000
+     b38:	6785                	lui	a5,0x1
+     b3a:	fa078793          	addi	a5,a5,-96 # fa0 <string0+0xf8>
+	bge a2, a5, ret_from_se0
+     b3e:	f8f652e3          	bge	a2,a5,ac2 <ret_from_se0>
+	li a5, -4000
+     b42:	77fd                	lui	a5,0xfffff
+     b44:	06078793          	addi	a5,a5,96 # fffff060 <__global_pointer$+0xdfffe860>
+	blt a2, a5, ret_from_se0
+     b48:	f6f64de3          	blt	a2,a5,ac2 <ret_from_se0>
+
+	c.lw a1, SE0_WINDUP_OFFSET(a4) // load windup se0_windup
+     b4c:	4f0c                	lw	a1,24(a4)
+	c.add a1, a2
+     b4e:	95b2                	add	a1,a1,a2
+	c.sw a1, SE0_WINDUP_OFFSET(a4) // save windup
+     b50:	cf0c                	sw	a1,24(a4)
+
+	// No further adjustments
+	beqz a1, ret_from_se0
+     b52:	d9a5                	beqz	a1,ac2 <ret_from_se0>
+
+	// 0x40021000 = RCC.CTLR
+	la a4, 0x40021000
+     b54:	40021737          	lui	a4,0x40021
+	lw a0, 0(a4)
+     b58:	4308                	lw	a0,0(a4)
+	srli a2, a0, 3 // Extract HSI Trim.
+     b5a:	00355613          	srli	a2,a0,0x3
+	andi a2, a2, 0b11111
+     b5e:	8a7d                	andi	a2,a2,31
+	li a5, 0xffffff07  
+     b60:	f0700793          	li	a5,-249
+	and a0, a0, a5	// Mask off non-HSI
+     b64:	8d7d                	and	a0,a0,a5
+
+	// Decimate windup - use as HSIrim.
+	neg a1, a1
+     b66:	40b005b3          	neg	a1,a1
+	srai a2, a1, 9
+     b6a:	4095d613          	srai	a2,a1,0x9
+	addi a2, a2, 16  // add hsi offset.
+     b6e:	0641                	addi	a2,a2,16
+
+	// Put trim in place in register.
+	slli a2, a2, 3
+     b70:	060e                	slli	a2,a2,0x3
+	or a0, a0, a2
+     b72:	8d51                	or	a0,a0,a2
+	sw a0, 0(a4)
+     b74:	c308                	sw	a0,0(a4)
+
+	j ret_from_se0
+     b76:	b7b1                	j	ac2 <ret_from_se0>
+
+00000b78 <usb_send_empty>:
+
+
+.balign 4
+//void usb_send_empty( uint32_t token );
+usb_send_empty:
+	c.mv a3, a0
+     b78:	86aa                	mv	a3,a0
+	la a0, always0
+     b7a:	00000517          	auipc	a0,0x0
+     b7e:	13a50513          	addi	a0,a0,314 # cb4 <always0>
+	li a1, 2
+     b82:	4589                	li	a1,2
+	c.mv a2, a1
+     b84:	862e                	mv	a2,a1
+
+00000b86 <usb_send_data>:
+//void usb_send_data( uint8_t * data, uint32_t length, uint32_t poly_function, uint32_t token );
+usb_send_data:
+	addi	sp,sp,-16
+     b86:	1141                	addi	sp,sp,-16
+	sw	s0, 0(sp)
+     b88:	c022                	sw	s0,0(sp)
+	sw	s1, 4(sp)
+     b8a:	c226                	sw	s1,4(sp)
+
+	la a5, USB_GPIO_BASE
+     b8c:	400117b7          	lui	a5,0x40011
+     b90:	40078793          	addi	a5,a5,1024 # 40011400 <__global_pointer$+0x20010c00>
+
+	// ASAP: Turn the bus around and send our preamble + token.
+	c.lw a4, CFGLR_OFFSET(a5)
+     b94:	4398                	lw	a4,0(a5)
+
+	li s1, ~((0b1111<<(USB_DM*4)) | (0b1111<<(USB_DP*4)))
+     b96:	fff014b7          	lui	s1,0xfff01
+     b9a:	14fd                	addi	s1,s1,-1
+	and a4, s1, a4
+     b9c:	8f65                	and	a4,a4,s1
+
+	// Convert D+/D- into 2MHz outputs
+	li s1, ((0b0010<<(USB_DM*4)) | (0b0010<<(USB_DP*4)))
+     b9e:	000224b7          	lui	s1,0x22
+	or a4, s1, a4
+     ba2:	8f45                	or	a4,a4,s1
+
+	li s1, (1<<USB_DM) | (1<<(USB_DP+16))
+     ba4:	001004b7          	lui	s1,0x100
+     ba8:	04a1                	addi	s1,s1,8
+	c.sw s1, BSHR_OFFSET(a5)
+     baa:	cb84                	sw	s1,16(a5)
+
+	//00: Universal push-pull output mode
+	c.sw a4, CFGLR_OFFSET(a5)
+     bac:	c398                	sw	a4,0(a5)
+
+	li t1, (1<<USB_DM) | (1<<(USB_DP+16)) | (1<<USB_DP) | (1<<(USB_DM+16));
+     bae:	00180337          	lui	t1,0x180
+     bb2:	0361                	addi	t1,t1,24
+
+	SAVE_DEBUG_MARKER( 8 )
+     bb4:	c412                	sw	tp,8(sp)
+
+	// Save off our preamble and token.
+	c.slli a3, 7     //Put token further up so it gets sent later.
+     bb6:	069e                	slli	a3,a3,0x7
+	ori s0, a3, 0x40  
+     bb8:	0406e413          	ori	s0,a3,64
+
+	li t0, 0x0000
+     bbc:	4281                	li	t0,0
+	c.bnez a2, done_poly_check
+     bbe:	e609                	bnez	a2,bc8 <done_poly_check>
+	li t0, 0xa001
+     bc0:	62a9                	lui	t0,0xa
+     bc2:	0285                	addi	t0,t0,1
+	li a2, 0xffff
+     bc4:	6641                	lui	a2,0x10
+     bc6:	167d                	addi	a2,a2,-1
+
+00000bc8 <done_poly_check>:
+done_poly_check:
+
+	c.slli a1, 3 // bump up one extra to be # of bits
+     bc8:	058e                	slli	a1,a1,0x3
+	mv t2, a1
+     bca:	83ae                	mv	t2,a1
+
+	// t0 is our polynomial
+	// a2 is our running CRC.
+	// a3 is our token.
+	DEBUG_TICK_SETUP
+     bcc:	40013237          	lui	tp,0x40013
+     bd0:	c5820213          	addi	tp,tp,-936 # 40012c58 <__global_pointer$+0x20012458>
+
+	c.li a4, 6 // reset bit stuffing.
+     bd4:	4719                	li	a4,6
+	c.li a1, 15 // 15 bits.
+     bd6:	45bd                	li	a1,15
+
+	//c.nop; c.nop; c.nop;
+	c.j pre_and_tok_send_inner_loop
+     bd8:	a011                	j	bdc <pre_and_tok_send_inner_loop>
+     bda:	0001                	nop
+
+00000bdc <pre_and_tok_send_inner_loop>:
+		* We have to decrement our bit stuffing index.
+		* If it is 0, we can reset our bit stuffing index.
+	*/
+
+	// a3 is now the lsb of s0 (the 'next bit' to read out)
+	c.mv a3, s0
+     bdc:	86a2                	mv	a3,s0
+	c.srli s0, 1 // Shift down into the next bit.
+     bde:	8005                	srli	s0,s0,0x1
+	c.andi a3, 1
+     be0:	8a85                	andi	a3,a3,1
+	// If a3 is 0, we should FLIP
+	// if a3 is 1, we should NOT flip.
+
+	c.addi a4, -1
+     be2:	177d                	addi	a4,a4,-1
+	c.bnez a3, pre_and_tok_send_one_bit
+     be4:	e681                	bnez	a3,bec <pre_and_tok_send_one_bit>
+//Send 0 bit. (Flip)
+	// Flip s1 (our bshr setting) by xoring it.
+	// 10.....01
+	// 11.....11 (xor with)
+	// 01.....10
+	xor s1, s1, t1
+     be6:	0064c4b3          	xor	s1,s1,t1
+	c.li a4, 6 // reset bit stuffing.
+     bea:	4719                	li	a4,6
+
+00000bec <pre_and_tok_send_one_bit>:
+	// DO NOT flip.  Allow a4 to increment.
+// Deliberately unaligned for timing purposes.
+.balign 4
+pre_and_tok_send_one_bit:
+	sw s1, BSHR_OFFSET(a5)
+     bec:	cb84                	sw	s1,16(a5)
+	//Bit stuffing doesn't happen.
+	c.addi a1, -1
+     bee:	15fd                	addi	a1,a1,-1
+	c.beqz a1, pre_and_tok_done_sending_data
+     bf0:	c591                	beqz	a1,bfc <pre_and_tok_done_sending_data>
+	nx6p3delay( 2, a3 );	c.nop;             // Free time!
+     bf2:	468d                	li	a3,3
+     bf4:	16fd                	addi	a3,a3,-1
+     bf6:	fefd                	bnez	a3,bf4 <pre_and_tok_send_one_bit+0x8>
+     bf8:	0001                	nop
+	c.j pre_and_tok_send_inner_loop
+     bfa:	b7cd                	j	bdc <pre_and_tok_send_inner_loop>
+
+00000bfc <pre_and_tok_done_sending_data>:
+////////////////////////////////////////////////////////////////////////////
+
+	// We have very little time here.  Just enough to do this.
+
+	//Restore size.
+	mv a1, t2//lw  a1, 12(sp)
+     bfc:	859e                	mv	a1,t2
+	c.beqz a1, no_really_done_sending_data  //No actual payload?  Bail!
+     bfe:	c5ad                	beqz	a1,c68 <no_really_done_sending_data>
+	c.addi a1, -1
+     c00:	15fd                	addi	a1,a1,-1
+//	beqz t2, no_really_done_sending_data 
+
+	bnez t0, done_poly_check2
+     c02:	00029463          	bnez	t0,c0a <done_poly_check2>
+	li a2, 0xffff
+     c06:	6641                	lui	a2,0x10
+     c08:	167d                	addi	a2,a2,-1
+
+00000c0a <done_poly_check2>:
+     c0a:	0001                	nop
+
+00000c0c <load_next_byte>:
+     c0c:	2100                	fld	fs0,0(a0)
+	// CH32v003 has the XW extension.
+	// this replaces: lb s0, 0(a0)
+	XW_C_LBU(s0, a0, 0);
+	//lb s0, 0(a0)
+	//	.long 0x00150513 // addi a0, a0, 1  (For alignment's sake)
+	c.addi a0, 1
+     c0e:	0505                	addi	a0,a0,1
+
+00000c10 <send_inner_loop>:
+		* We have to decrement our bit stuffing index.
+		* If it is 0, we can reset our bit stuffing index.
+	*/
+
+	// a3 is now the lsb of s0 (the 'next bit' to read out)
+	c.mv a3, s0
+     c10:	86a2                	mv	a3,s0
+	c.andi a3, 1
+     c12:	8a85                	andi	a3,a3,1
+	// If a3 is 0, we should FLIP
+	// if a3 is 1, we should NOT flip.
+	c.beqz a3, send_zero_bit
+     c14:	ce81                	beqz	a3,c2c <send_zero_bit>
+	c.srli s0, 1 // Shift down into the next bit.
+     c16:	8005                	srli	s0,s0,0x1
+//send_one_bit:
+	//HANDLE_CRC (1 bit)
+	andi a3, a2, 1
+     c18:	00167693          	andi	a3,a2,1
+	c.addi a3, -1
+     c1c:	16fd                	addi	a3,a3,-1
+	and a3, a3, t0
+     c1e:	0056f6b3          	and	a3,a3,t0
+	c.srli a2, 1
+     c22:	8205                	srli	a2,a2,0x1
+	c.xor a2, a3
+     c24:	8e35                	xor	a2,a2,a3
+
+	c.addi a4, -1
+     c26:	177d                	addi	a4,a4,-1
+	c.beqz a4, insert_stuffed_bit
+     c28:	cf25                	beqz	a4,ca0 <insert_stuffed_bit>
+	c.j cont_after_jump
+     c2a:	a829                	j	c44 <cont_after_jump>
+
+00000c2c <send_zero_bit>:
+//Send 0 bit. (Flip)
+.balign 4
+send_zero_bit:
+	c.srli s0, 1 // Shift down into the next bit.
+     c2c:	8005                	srli	s0,s0,0x1
+	// a3 is temp
+	// t0 is polynomial.
+
+	// XXX WARNING: this was by https://github.com/cnlohr/rv003usb/issues/7 
+	// TODO Check me!
+	slli a3,a2,31 // Put a3s LSB into a0s MSB
+     c2e:	01f61693          	slli	a3,a2,0x1f
+	c.srai a3,31    // Copy MSB into all other bits
+     c32:	86fd                	srai	a3,a3,0x1f
+
+	// Flip s1 (our bshr setting) by xoring it.
+	// 10.....01
+	// 11.....11 (xor with)
+	// 01.....10
+	xor s1, s1, t1
+     c34:	0064c4b3          	xor	s1,s1,t1
+	sw s1, BSHR_OFFSET(a5)
+     c38:	cb84                	sw	s1,16(a5)
+
+	c.li a4, 6 // reset bit stuffing.
+     c3a:	4719                	li	a4,6
+
+	// XXX XXX CRC down here to make bit stuffing timings line up.
+	c.srli a2,1
+     c3c:	8205                	srli	a2,a2,0x1
+	and a3,a3,t0
+     c3e:	0056f6b3          	and	a3,a3,t0
+	c.xor  a2,a3 
+     c42:	8e35                	xor	a2,a2,a3
+
+00000c44 <cont_after_jump>:
+
+.balign 4
+cont_after_jump:
+send_end_bit_complete:
+	c.beqz a1, done_sending_data
+     c44:	c981                	beqz	a1,c54 <done_sending_data>
+	andi a3, a1, 7
+     c46:	0075f693          	andi	a3,a1,7
+	c.addi a1, -1
+     c4a:	15fd                	addi	a1,a1,-1
+	c.beqz a3, load_next_byte
+     c4c:	d2e1                	beqz	a3,c0c <load_next_byte>
+	// Wait an extra few cycles.
+	c.j 1f; 1:
+     c4e:	a009                	j	c50 <cont_after_jump+0xc>
+	c.j send_inner_loop
+     c50:	b7c1                	j	c10 <send_inner_loop>
+     c52:	0001                	nop
+
+00000c54 <done_sending_data>:
+
+.balign 4
+done_sending_data:
+	// BUT WAIT!! MAYBE WE NEED TO CRC!
+	beqz t0, no_really_done_sending_data
+     c54:	00028a63          	beqz	t0,c68 <no_really_done_sending_data>
+	srli t0, t0, 8 // reset poly - we don't want it anymore.
+     c58:	0082d293          	srli	t0,t0,0x8
+	li a1, 7 // Load 8 more bits out
+     c5c:	459d                	li	a1,7
+	beqz t0, send_inner_loop  //Second CRC byte
+     c5e:	fa0289e3          	beqz	t0,c10 <send_inner_loop>
+	// First CRC byte
+	not s0, a2 // get read to send out the CRC.
+     c62:	fff64413          	not	s0,a2
+	c.j send_inner_loop
+     c66:	b76d                	j	c10 <send_inner_loop>
+
+00000c68 <no_really_done_sending_data>:
+.balign 4
+no_really_done_sending_data:
+
+//	c.bnez a2, poly_function  TODO: Uncomment me!
+
+	nx6p3delay( 2, a3 );
+     c68:	468d                	li	a3,3
+     c6a:	16fd                	addi	a3,a3,-1
+     c6c:	fefd                	bnez	a3,c6a <no_really_done_sending_data+0x2>
+
+	// Need to perform an SE0.
+	li s1, (1<<(USB_DP+16)) | (1<<(USB_DM+16))
+     c6e:	001804b7          	lui	s1,0x180
+	c.sw s1, BSHR_OFFSET(a5)
+     c72:	cb84                	sw	s1,16(a5)
+
+	nx6p3delay( 7, a3 );
+     c74:	46a1                	li	a3,8
+     c76:	16fd                	addi	a3,a3,-1
+     c78:	fefd                	bnez	a3,c76 <no_really_done_sending_data+0xe>
+
+	li s1, (1<<(USB_DP)) | (1<<(USB_DM+16))
+     c7a:	000804b7          	lui	s1,0x80
+     c7e:	04c1                	addi	s1,s1,16
+	c.sw s1, BSHR_OFFSET(a5)
+     c80:	cb84                	sw	s1,16(a5)
+
+	lw s1, CFGLR_OFFSET(a5)
+     c82:	4384                	lw	s1,0(a5)
+	// Convert D+/D- into inputs.
+	li a3, ~((0b11<<(USB_DM*4)) | (0b11<<(USB_DP*4)))
+     c84:	fffcd6b7          	lui	a3,0xfffcd
+     c88:	16fd                	addi	a3,a3,-1
+	and s1, a3, s1
+     c8a:	8cf5                	and	s1,s1,a3
+	// 01: Floating input mode.
+	li a3, ((0b01<<(USB_DM*4+2)) | (0b01<<(USB_DP*4+2)))
+     c8c:	000446b7          	lui	a3,0x44
+	or s1, a3, s1
+     c90:	8cd5                	or	s1,s1,a3
+	sw s1, CFGLR_OFFSET(a5)
+     c92:	c384                	sw	s1,0(a5)
+
+	lw	s0, 0(sp)
+     c94:	4402                	lw	s0,0(sp)
+	lw	s1, 4(sp)
+     c96:	4492                	lw	s1,4(sp)
+	RESTORE_DEBUG_MARKER( 8 )
+     c98:	4222                	lw	tp,8(sp)
+	addi	sp,sp,16
+     c9a:	0141                	addi	sp,sp,16
+	ret
+     c9c:	8082                	ret
+     c9e:	0001                	nop
+
+00000ca0 <insert_stuffed_bit>:
+
+.balign 4
+// TODO: This seems to be either 222 or 226 (not 224) in cases.
+// It's off by 2 clock cycles.  Probably OK, but, hmm.
+insert_stuffed_bit:
+	nx6p3delay(3, a3)
+     ca0:	4691                	li	a3,4
+     ca2:	16fd                	addi	a3,a3,-1
+     ca4:	fefd                	bnez	a3,ca2 <insert_stuffed_bit+0x2>
+	xor s1, s1, t1
+     ca6:	0064c4b3          	xor	s1,s1,t1
+	c.li a4, 6 // reset bit stuffing.
+     caa:	4719                	li	a4,6
+	c.nop
+     cac:	0001                	nop
+	c.nop
+     cae:	0001                	nop
+	sw s1, BSHR_OFFSET(a5)
+     cb0:	cb84                	sw	s1,16(a5)
+	c.j send_end_bit_complete
+     cb2:	bf49                	j	c44 <cont_after_jump>
+
+00000cb4 <always0>:
+     cb4:	0000                	unimp
+     cb6:	0000                	unimp
+     cb8:	049a                	slli	s1,s1,0x6
+     cba:	0000                	unimp
+     cbc:	04a2                	slli	s1,s1,0x8
+     cbe:	0000                	unimp
+     cc0:	04aa                	slli	s1,s1,0xa
+     cc2:	0000                	unimp
+     cc4:	04b2                	slli	s1,s1,0xc
+     cc6:	0000                	unimp
+     cc8:	04ba                	slli	s1,s1,0xe
+     cca:	0000                	unimp
+     ccc:	04c2                	slli	s1,s1,0x10
+     cce:	0000                	unimp
+     cd0:	04ca                	slli	s1,s1,0x12
+     cd2:	0000                	unimp
+     cd4:	04d2                	slli	s1,s1,0x14
+     cd6:	0000                	unimp
+     cd8:	04da                	slli	s1,s1,0x16
+     cda:	0000                	unimp
+     cdc:	04e2                	slli	s1,s1,0x18
+     cde:	0000                	unimp
+     ce0:	04ea                	slli	s1,s1,0x1a
+     ce2:	0000                	unimp
+     ce4:	04f2                	slli	s1,s1,0x1c
+     ce6:	0000                	unimp
+     ce8:	0438                	addi	a4,sp,520
+     cea:	0000                	unimp
+     cec:	0442                	slli	s0,s0,0x10
+     cee:	0000                	unimp
+     cf0:	044a                	slli	s0,s0,0x12
+     cf2:	0000                	unimp
+     cf4:	0452                	slli	s0,s0,0x14
+     cf6:	0000                	unimp
+     cf8:	045a                	slli	s0,s0,0x16
+     cfa:	0000                	unimp
+     cfc:	0462                	slli	s0,s0,0x18
+     cfe:	0000                	unimp
+     d00:	046a                	slli	s0,s0,0x1a
+     d02:	0000                	unimp
+     d04:	0472                	slli	s0,s0,0x1c
+     d06:	0000                	unimp
+     d08:	047a                	slli	s0,s0,0x1e
+     d0a:	0000                	unimp
+     d0c:	0482                	c.slli64	s1
+     d0e:	0000                	unimp
+     d10:	048a                	slli	s1,s1,0x2
+     d12:	0000                	unimp
+     d14:	0492                	slli	s1,s1,0x4
+     d16:	0000                	unimp
+     d18:	051c                	addi	a5,sp,640
+     d1a:	0000                	unimp
+     d1c:	0528                	addi	a0,sp,648
+     d1e:	0000                	unimp
+     d20:	0530                	addi	a2,sp,648
+     d22:	0000                	unimp
+     d24:	0538                	addi	a4,sp,648
+     d26:	0000                	unimp
+     d28:	0540                	addi	s0,sp,644
+     d2a:	0000                	unimp
+     d2c:	0548                	addi	a0,sp,644
+     d2e:	0000                	unimp
+     d30:	0550                	addi	a2,sp,644
+     d32:	0000                	unimp
+     d34:	0558                	addi	a4,sp,644
+     d36:	0000                	unimp
+     d38:	0560                	addi	s0,sp,652
+     d3a:	0000                	unimp
+     d3c:	0568                	addi	a0,sp,652
+     d3e:	0000                	unimp
+     d40:	05ee                	slli	a1,a1,0x1b
+     d42:	0000                	unimp
+     d44:	05f6                	slli	a1,a1,0x1d
+	...
+
+00000d48 <descriptor_list>:
+     d48:	0100 0000 0e64 0000 0012 0000 0200 0000     ....d...........
+     d58:	0e28 0000 003b 0000 2200 0000 0de8 0000     (...;...."......
+     d68:	003f 0000 2200 0001 0da8 0000 003f 0000     ?...."......?...
+     d78:	0300 0000 0ea8 0000 0004 0000 0301 0409     ................
+     d88:	0e98 0000 000e 0000 0302 0409 0e84 0000     ................
+     d98:	0012 0000 0303 0409 0e78 0000 0008 0000     ........x.......
+
+00000da8 <keyboard_hid_desc>:
+     da8:	0105 0609 01a1 0175 0895 0705 e019 e729     ......u.......).
+     db8:	0015 0125 0281 0195 0875 0381 0595 0175     ..%.....u.....u.
+     dc8:	0805 0119 0529 0291 0195 0375 0391 0695     ....).....u.....
+     dd8:	0875 0015 a725 0705 0019 a729 0081 00c0     u...%.....).....
+
+00000de8 <mouse_hid_desc>:
+     de8:	0105 0909 01a1 0109 00a1 0905 0119 0329     ..............).
+     df8:	0015 0125 0395 0175 0281 0195 0575 0381     ..%...u.....u...
+     e08:	0105 3009 3109 3809 8115 7f25 0875 0395     ...0.1.8..%.u...
+     e18:	0681 c0c0 01a1 aa85 ff09 00b1 0895 00c0     ................
+
+00000e28 <config_descriptor>:
+     e28:	0209 003b 0102 8000 0964 0004 0100 0103     ..;.....d.......
+     e38:	0002 2109 0110 0100 3f22 0700 8105 0403     ...!...."?......
+     e48:	0a00 0409 0001 0301 0101 0900 1021 0001     ............!...
+     e58:	2201 003f 0507 0382 0008 000a               ."?.........
+
+00000e64 <device_descriptor>:
+     e64:	0112 0110 0000 0800 1209 c003 0002 0201     ................
+     e74:	0103 0000                                   ....
+
+00000e78 <string3>:
+     e78:	0308 0030 0030 0030 0000 0000               ..0.0.0.....
+
+00000e84 <string2>:
+     e84:	0312 0052 0056 0030 0030 0033 0055 0053     ..R.V.0.0.3.U.S.
+     e94:	0042 0000                                   B...
+
+00000e98 <string1>:
+     e98:	030e 0043 004e 004c 006f 0068 0072 0000     ..C.N.L.o.h.r...
+
+00000ea8 <string0>:
+     ea8:	0304 0409 6f4d 6564 3020 4b20 7965 3120     ....Mode 0 Key 1
+     eb8:	000a 0000 6f4d 6564 3020 4b20 7965 3220     ....Mode 0 Key 2
+     ec8:	000a 0000 6f4d 6564 3020 4b20 7965 3320     ....Mode 0 Key 3
+     ed8:	000a 0000 6f4d 6564 3020 4b20 7965 3420     ....Mode 0 Key 4
+     ee8:	000a 0000 6f4d 6564 3020 4b20 7965 3520     ....Mode 0 Key 5
+     ef8:	000a 0000 6f4d 6564 3020 4b20 7965 3620     ....Mode 0 Key 6
+     f08:	000a 0000 6f4d 6564 3020 4b20 7965 3720     ....Mode 0 Key 7
+     f18:	000a 0000 6f4d 6564 3020 4b20 7965 3820     ....Mode 0 Key 8
+     f28:	000a 0000 6f4d 6564 3020 4b20 7965 3920     ....Mode 0 Key 9
+     f38:	000a 0000 6f4d 6564 3020 4b20 7965 3120     ....Mode 0 Key 1
+     f48:	0a30 0000 6f4d 6564 3020 4b20 7965 3120     0...Mode 0 Key 1
+     f58:	0a31 0000 6f4d 6564 3020 4b20 7965 3120     1...Mode 0 Key 1
+     f68:	0a32 0000 6f4d 6564 3120 4b20 7965 3120     2...Mode 1 Key 1
+     f78:	000a 0000 6f4d 6564 3120 4b20 7965 3220     ....Mode 1 Key 2
+     f88:	000a 0000 6f4d 6564 3120 4b20 7965 3320     ....Mode 1 Key 3
+     f98:	000a 0000 6f4d 6564 3120 4b20 7965 3420     ....Mode 1 Key 4
+     fa8:	000a 0000 6f4d 6564 3120 4b20 7965 3520     ....Mode 1 Key 5
+     fb8:	000a 0000 6f4d 6564 3120 4b20 7965 3620     ....Mode 1 Key 6
+     fc8:	000a 0000 6f4d 6564 3120 4b20 7965 3720     ....Mode 1 Key 7
+     fd8:	000a 0000 6f4d 6564 3120 4b20 7965 3820     ....Mode 1 Key 8
+     fe8:	000a 0000 6f4d 6564 3120 4b20 7965 3920     ....Mode 1 Key 9
+     ff8:	000a 0000 6f4d 6564 3120 4b20 7965 3120     ....Mode 1 Key 1
+    1008:	0a30 0000 6f4d 6564 3120 4b20 7965 3120     0...Mode 1 Key 1
+    1018:	0a31 0000 6f4d 6564 3120 4b20 7965 3120     1...Mode 1 Key 1
+    1028:	0a32 0000 0037 0000 0038 0000 0039 0000     2...7...8...9...
+    1038:	0034 0000 0035 0000 0036 0000 0031 0000     4...5...6...1...
+    1048:	0032 0000 0033 0000 0030 0000               2...3...0...
